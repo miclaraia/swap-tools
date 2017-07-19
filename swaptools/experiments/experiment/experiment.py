@@ -2,8 +2,8 @@
 from swap import Control
 from swap.agents.agent import Stat
 from swap.utils.scores import Score, ScoreExport
-import swaptools.experiments.config as config
 import swap.ui
+import swaptools.experiments.config as config
 import swaptools.experiments.db.experiment_data as dbe
 import swaptools.experiments.db.plots as plotsdb
 
