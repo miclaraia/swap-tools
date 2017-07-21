@@ -1,6 +1,6 @@
 
 from swap import Control
-from swap.agents.agent import Stat
+from swap.utils.stats import Stat
 from swap.utils.scores import Score, ScoreExport
 import swap.ui
 import swaptools.experiments.config as config

@@ -1,7 +1,7 @@
 
 import swap.plots.distributions as distributions
 from swap.utils.golds import GoldGetter
-from swap.agents.agent import Stat
+from swap.utils.stats import Stat
 
 import swaptools.experiments.experiment as experiment
 
