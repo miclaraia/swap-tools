@@ -1,6 +1,7 @@
 
 from swap.db.db import Collection, Cursor
 
+from collections import OrderedDict
 import logging
 
 logger = logging.getLogger(__name__)
@@ -16,9 +17,12 @@ class Trials(Collection):
     @staticmethod
     def _schema():
         return {
-            'trial': dict,
-            'golds': dict,
-            'thresholds': list,
+            'experiment': int,
+            'trial': int,
+            'info': dict,
+            'golds': list,
+            'score_stats': dict,
+            'gold_stats': dict,
         }
 
     def _init_collection(self):
@@ -31,4 +35,11 @@ class Trials(Collection):
         self.insert(data)
 
     def get(self, trial_id):
-        pass
+        cursor = self.collection.find({'trial': trial_id})
+
+        if cursor.hasNext():
+            return cursor.next()
+
+    def get_experiment(self, experiment_id):
+        cursor = self.collection.find({'experiment': experiment_id})
+        return cursor
