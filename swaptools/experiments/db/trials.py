@@ -21,6 +21,7 @@ class Trials(Collection):
             'trial': int,
             'info': dict,
             'golds': list,
+            'thresholds': list,
             'score_stats': dict,
             'gold_stats': dict,
         }
@@ -40,6 +41,19 @@ class Trials(Collection):
         if cursor.hasNext():
             return cursor.next()
 
-    def get_experiment(self, experiment_id):
+    def get_trials(self, experiment_id):
         cursor = self.collection.find({'experiment': experiment_id})
-        return cursor
+
+        trials = []
+        for data in cursor:
+            trials.append(data)
+
+        return trials
+
+    def next_id(self):
+        cursor = self.collection.find().sort({'trial': -1}).limit(1)
+
+        if cursor.hasNext():
+            return cursor.next()['trial'] + 1
+
+        return 0

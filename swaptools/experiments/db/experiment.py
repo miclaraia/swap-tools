@@ -17,6 +17,7 @@ class Experiments(Collection):
     def _schema():
         return {
             'experiment': int,
+            'name': str,
             'description': str
         }
 
@@ -29,8 +30,16 @@ class Experiments(Collection):
         data = experiment.dict()
         self.insert(data)
 
-    def get(self, trial_id):
-        cursor = self.collection.find({'experiment': trial_id})
+    def get(self, experiment_id):
+        cursor = self.collection.find({'experiment': experiment_id})
 
         if cursor.hasNext():
             return cursor.next()
+
+    def next_id(self):
+        cursor = self.collection.find().sort({'experiment': -1}).limit(1)
+
+        if cursor.hasNext():
+            return cursor.next()['experiment'] + 1
+
+        return 0

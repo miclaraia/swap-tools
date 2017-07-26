@@ -1,5 +1,7 @@
 
 import swaptools.experiments.config as config
+from swaptools.experiments.db.experiment import Experiments
+from swaptools.experiments.db.trials import Trials
 from swap.utils import Singleton
 from pymongo import MongoClient
 
@@ -31,9 +33,9 @@ class _DB:
         self._db = self._client[db_name]
         self.batch_size = int(config.experiment_db.max_batch_size)
 
-        self.data = self._db.data
-        self.trials = self._db.trials
-        self.plots = self._db.plots
+        self.experiments = Experiments(self)
+        self.trials = Trials(self)
+        self.plots = None
         # pylint: enable=E1101
 
     def setBatchSize(self, size):
