@@ -96,6 +96,7 @@ class Experiment:
 
         self._trials = {}
         self.trial_info = {'n': None}
+        self.trial_id = None
 
         self.control = None
         self.gg = GoldGetter()
@@ -139,10 +140,14 @@ class Experiment:
         logger.info('Done running trial')
         thresholds = self.thresholds
         scores = self.control.swap.score_export(thresholds)
-        trial_id = DB().trials.next_id()
+
+        if self.trial_id is None:
+            self.trial_id = DB().trials.next_id()
+        else:
+            self.trial_id += 1
 
         trial = Trial.generate(
-            experiment=self.id, trial=trial_id, info=self.trial_info,
+            experiment=self.id, trial=self.trial_id, info=self.trial_info,
             golds=self.gg.golds, score_export=scores)
         self.add_trial(trial)
 
@@ -154,6 +159,8 @@ class Experiment:
             self.setup_next()
             self._run()
             self.post()
+        logger.info('Done running trials')
+        self.upload()
         logger.info('All done')
 
     ###############################################################
@@ -210,11 +217,13 @@ class Experiment:
         return trials
 
     def upload(self):
+        logger.info('Uploading trials')
         DB().experiments.insert(self.dict())
 
         trials = []
         for trial in self.trials:
             trials.append(trial.dict())
+        print(trials)
         DB().trials.insert_many(trials)
 
 
@@ -247,7 +256,7 @@ class Interace(ui.Interface):
         experiment = None
         if args.run:
             name = args.name[0]
-            desc = args.description
+            desc = args.description[0]
             experiment = self.run(name, desc, args)
 
         if args.shell:

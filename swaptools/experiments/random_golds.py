@@ -35,7 +35,7 @@ class RandomGolds(Experiment):
         golds = self.trial_info['golds']
         golds += self.num_golds[2]
 
-        if n >= self.num_trials and golds >= self.num_golds[1]:
+        if n >= self.num_trials and golds > self.num_golds[1]:
             return False
         return True
 
@@ -47,10 +47,10 @@ class RandomGolds(Experiment):
         super().setup_next()
         info = self.trial_info
         if info['n'] >= self.num_trials:
-            info['n'] = 0
+            self.trial_info['n'] = 0
             info['golds'] += self.num_golds[2]
 
-        logger.info(str(info))
+        logger.info('%s %s', str(info), str(self.num_trials))
         self.gg.reset()
         self.gg.random(info['golds'])
 
@@ -86,11 +86,11 @@ class Interface(_Interface):
             'description': description,
         }
         if args.num_golds:
-            golds = [int(i) for i in args.num_golds[0:2]]
+            golds = [int(i) for i in args.num_golds[0:3]]
             kwargs['num_golds'] = tuple(golds)
 
         if args.num_trials:
-            kwargs['num_trials'] = int(args.num_golds[0])
+            kwargs['num_trials'] = int(args.num_trials[0])
 
         e = RandomGolds.new(**kwargs)
         e.run()
