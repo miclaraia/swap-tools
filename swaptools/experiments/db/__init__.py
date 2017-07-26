@@ -25,13 +25,13 @@ class _DB:
 
         # Get database configuration from config file
         # pylint: disable=E1101
-        host = config.experiment_db.host
-        db_name = config.experiment_db.name
-        port = config.experiment_db.port
+        host = config.experiments.host
+        db_name = config.experiments.name
+        port = config.experiments.port
 
         self._client = MongoClient('%s:%d' % (host, port))
         self._db = self._client[db_name]
-        self.batch_size = int(config.experiment_db.max_batch_size)
+        self.batch_size = int(config.experiments.max_batch_size)
 
         self.experiments = Experiments(self)
         self.trials = Trials(self)
@@ -44,21 +44,6 @@ class _DB:
     def close(self):
         logger.info('closing mongo connection')
         self._client.close()
-
-
-# class _Config(_config.Config):
-
-#     experiment_db = _config.Object({
-#         'name': 'experimentsDB',
-#         'host': 'localhost',
-#         'port': 27017,
-#         'max_batch_size': 1e5,
-#     })
-
-#     trials = _config.Object({
-#         'keep_amount': 10,
-#         'cutoff': 0.96
-#     })
 
 
 class DB(_DB, metaclass=Singleton):
