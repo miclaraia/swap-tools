@@ -1,5 +1,5 @@
 
-from swap.db.db import Collection
+from swap.db.db import Collection, Schema
 
 import logging
 
@@ -16,9 +16,9 @@ class Experiments(Collection):
     @staticmethod
     def _schema():
         return {
-            'experiment': int,
-            'name': str,
-            'description': str
+            'experiment': {'type': int},
+            'name': {'type': str},
+            'description': {'type': str}
         }
 
     def _init_collection(self):

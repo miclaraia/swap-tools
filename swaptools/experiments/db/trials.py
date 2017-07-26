@@ -17,13 +17,13 @@ class Trials(Collection):
     @staticmethod
     def _schema():
         return {
-            'experiment': int,
-            'trial': int,
-            'info': dict,
-            'golds': list,
-            'thresholds': list,
-            'score_stats': dict,
-            'gold_stats': dict,
+            'experiment': {'type': int},
+            'trial': {'type': int},
+            'info': {'type': dict},
+            'golds': {'type': list},
+            'thresholds': {'type': list},
+            'score_stats': {'type': dict},
+            'gold_stats': {'type': dict},
         }
 
     def _init_collection(self):
