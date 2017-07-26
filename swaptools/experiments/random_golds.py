@@ -21,6 +21,9 @@ class RandomGolds(Experiment):
 
         self.trial_info.update({'golds': 0})
 
+    def info_key_order(self):
+        return ['n', 'golds']
+
     @classmethod
     def new(cls, *args, **kwargs):
         kwargs['experiment'] = DB().experiments.next_id()

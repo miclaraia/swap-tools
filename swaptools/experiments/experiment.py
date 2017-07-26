@@ -1,7 +1,5 @@
 
 from swap import Control
-from swap.utils.stats import Stat
-from swap.utils.scores import Score, ScoreExport, ScoreStats
 from swap.utils.golds import GoldStats, GoldGetter
 import swap.ui.ui as ui
 
@@ -57,15 +55,15 @@ class Trial:
         return cls(**kwargs)
 
     def dict(self):
-        return {
-            'experiment': self.experiment,
-            'trial': self.id,
-            'info': self.info,
-            'golds': self.golds,
-            'thresholds': list(self.thresholds),
-            'score_stats': self.score_stats,
-            'gold_stats': self.gold_stats,
-        }
+        return OrderedDict([
+            ('experiment', self.experiment),
+            ('trial', self.id),
+            ('info', self.info),
+            ('golds', self.golds),
+            ('thresholds', list(self.thresholds)),
+            ('score_stats', self.score_stats),
+            ('gold_stats', self.gold_stats)
+        ])
 
     @classmethod
     def interact_from_db(cls, trial_id):
@@ -76,6 +74,7 @@ class Trial:
 
         swap = control.getSWAP()
         scores = swap.score_export()
+        assert scores
         code.interact(local=locals())
 
     ###############################################################
@@ -95,7 +94,7 @@ class Experiment:
         self.description = description
 
         self._trials = {}
-        self.trial_info = {'n': None}
+        self.trial_info = OrderedDict([('n', None)])
         self.trial_id = None
 
         self.control = None
@@ -161,7 +160,8 @@ class Experiment:
             self.post()
         logger.info('Done running trials')
         self.upload()
-        logger.info('All done')
+        logger.info('All done, experiment %d, trials %d',
+                    self.id, len(self._trials))
 
     ###############################################################
 
@@ -260,4 +260,5 @@ class Interace(ui.Interface):
             experiment = self.run(name, desc, args)
 
         if args.shell:
+            assert experiment
             code.interact(local=locals())

@@ -19,11 +19,11 @@ class Trials(Collection):
         return {
             'experiment': {'type': int},
             'trial': {'type': int},
-            'info': {'type': dict},
+            'info': {'type': OrderedDict},
             'golds': {'type': list},
             'thresholds': {'type': list},
-            'score_stats': {'type': dict},
-            'gold_stats': {'type': dict},
+            'score_stats': {'type': OrderedDict},
+            'gold_stats': {'type': OrderedDict},
         }
 
     def _init_collection(self):
