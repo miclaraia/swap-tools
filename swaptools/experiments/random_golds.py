@@ -1,6 +1,11 @@
 
 from swaptools.experiments.experiment import Experiment
 from swaptools.experiments.experiment import Interace as _Interface
+from swaptools.experiments.db import DB
+
+import logging
+
+logger = logging.getLogger(__name__)
 
 class RandomGolds(Experiment):
 
@@ -16,8 +21,17 @@ class RandomGolds(Experiment):
 
         self.trial_info.update({'golds': 0})
 
+    @classmethod
+    def new(cls, *args, **kwargs):
+        kwargs['experiment'] = DB().experiments.next_id()
+        return cls(*args, **kwargs)
+
     def has_next(self):
-        n = self.trial_info['n'] + 1
+        n = self.trial_info['n']
+        if n is None:
+            return True
+        n += 1
+
         golds = self.trial_info['golds']
         golds += self.num_golds[2]
 
@@ -25,8 +39,9 @@ class RandomGolds(Experiment):
             return False
         return True
 
-    # def setup():
-    #     super().setup()
+    def setup(self):
+        super().setup()
+        self.trial_info['golds'] = self.num_golds[0]
 
     def setup_next(self):
         super().setup_next()
@@ -35,6 +50,7 @@ class RandomGolds(Experiment):
             info['n'] = 0
             info['golds'] += self.num_golds[2]
 
+        logger.info(str(info))
         self.gg.reset()
         self.gg.random(info['golds'])
 
@@ -70,8 +86,13 @@ class Interface(_Interface):
             'description': description,
         }
         if args.num_golds:
-            kwargs['num_golds'] = tuple(args.num_golds[0:2])
-        if args.num_trials:
-            kwargs['num_trials'] = args.num_golds[0]
+            golds = [int(i) for i in args.num_golds[0:2]]
+            kwargs['num_golds'] = tuple(golds)
 
-        return RandomGolds(**kwargs)
+        if args.num_trials:
+            kwargs['num_trials'] = int(args.num_golds[0])
+
+        e = RandomGolds.new(**kwargs)
+        e.run()
+
+        return e

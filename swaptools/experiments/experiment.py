@@ -103,25 +103,32 @@ class Experiment:
     ###############################################################
 
     def setup(self):
+        logger.info('Setting up')
         config.back_update = False
         self.control = self._init_control()
 
     @property
     def thresholds(self):
         history = self.control.swap.history
-        return history.score_export().thresholds
+        thresholds = history.score_export().thresholds
+        logger.info('Using thresholds %s', str(thresholds))
+
+        return thresholds
 
     @staticmethod
     def has_next():
         return False
 
     def setup_next(self):
+        logger.info('Setting up next trial')
         if self.trial_info['n'] is None:
             self.trial_info['n'] = 0
         else:
             self.trial_info['n'] += 1
 
     def _run(self):
+        logger.info('Running trial')
+        logger.debug('Using %d golds', len(self.gg.golds))
         control = self.control
         control.reset()
         control.gold_getter.these(self.gg.golds)
@@ -129,6 +136,7 @@ class Experiment:
         control.run()
 
     def post(self):
+        logger.info('Done running trial')
         thresholds = self.thresholds
         scores = self.control.swap.score_export(thresholds)
         trial_id = DB().trials.next_id()
@@ -143,8 +151,10 @@ class Experiment:
     def run(self):
         self.setup()
         while self.has_next():
+            self.setup_next()
             self._run()
             self.post()
+        logger.info('All done')
 
     ###############################################################
 

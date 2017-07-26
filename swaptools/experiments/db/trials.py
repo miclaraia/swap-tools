@@ -51,9 +51,9 @@ class Trials(Collection):
         return trials
 
     def next_id(self):
-        cursor = self.collection.find().sort({'trial': -1}).limit(1)
+        cursor = self.collection.find().sort('trial', -1).limit(1)
 
-        if cursor.hasNext():
+        try:
             return cursor.next()['trial'] + 1
-
-        return 0
+        except StopIteration:
+            return 0
