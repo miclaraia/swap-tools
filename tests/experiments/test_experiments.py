@@ -67,3 +67,21 @@ class TestRandomex:
         e.trial_info = {'n': 3, 'golds': 5}
 
         assert e.has_next() is False
+
+    def test_hasnext_false_2(self):
+        e = RandomGolds(None, None, None, (1, 5, 1), 4)
+        e.trial_info = {'n': 4, 'golds': 5}
+
+        assert e.has_next() is False
+
+    def test_hasnext_border_true(self):
+        e = RandomGolds(None, None, None, (1, 5, 1), 4)
+        e.trial_info = {'n': 2, 'golds': 5}
+
+        assert e.has_next() is True
+
+    def test_hasnext_border_true_2(self):
+        e = RandomGolds(None, None, None, (1, 5, 1), 4)
+        e.trial_info = {'n': 3, 'golds': 4}
+
+        assert e.has_next() is True
