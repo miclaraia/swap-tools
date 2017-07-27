@@ -146,7 +146,8 @@ class Experiment:
             self.trial_id += 1
 
         trial = Trial.generate(
-            experiment=self.id, trial=self.trial_id, info=self.trial_info,
+            experiment=self.id, trial=self.trial_id,
+            info=self.trial_info.copy(),
             golds=self.gg.golds, score_export=scores)
         self.add_trial(trial)
 

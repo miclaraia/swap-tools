@@ -1,40 +1,52 @@
 
-from swaptools.experiments.db import DB
+from swap.db.db import Collection, Cursor
 
+from collections import OrderedDict
 import logging
+
 logger = logging.getLogger(__name__)
 
-collection = DB().plots
+class Plots(Collection):
 
+    #######################################################################
 
-def aggregate(*args, **kwargs):
-    try:
-        logger.debug(*args, **kwargs)
-        return collection.aggregate(*args, **kwargs)
-    except Exception as e:
-        logger.error(e)
-        raise e
+    @staticmethod
+    def _collection_name():
+        return 'plots'
 
+    @staticmethod
+    def _schema():
+        return {
+            'plot': {'type': int},
+            'name': {'type': str},
+            'type': {'type': str},
+            'points': {'type': list},
+            'axes': {'type': dict}
+        }
 
-def upload_plot(name, plot_points):
-    data = []
-    for point in plot_points:
-        item = {'name': name, 'data': point}
-        data.append(item)
+    def _init_collection(self):
+        pass
 
-    logger.debug('uploading plot')
-    if len(data) > 0:
-        collection.insert_many(data)
-    logger.debug('done')
+    #######################################################################
 
+    def add(self, data):
+        logger.info('adding plot')
+        self.insert(data)
 
-def get_plot(name):
-    data = []
+    def get(self, plot, use_name=False):
+        if use_name:
+            cursor = self.collection.find({'name': plot})
+        else:
+            cursor = self.collection.find({'plot': plot})
 
-    logger.info('getting plot %s', name)
-    cursor = collection.find({'name': name})
+        if cursor.count() > 0:
+            plot = cursor.next()
+            plot.pop('_id')
+            return plot
 
-    for item in cursor:
-        data.append(item['data'])
+    def next_id(self):
+        cursor = self.collection.find().sort('plot', -1).limit(1)
 
-    return data
+        if cursor.count() == 0:
+            return 0
+        return cursor.next()['trial'] + 1
