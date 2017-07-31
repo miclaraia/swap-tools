@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <title>Flask Stock Visualizer</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href={{ url_for('static', filename='./bower_components/bootstrap/dist/css/bootstrap.min.css') }} rel="stylesheet" media="screen">
@@ -14,13 +14,25 @@
     <script src={{ url_for('static', filename='./node_modules/urijs/src/URI.js') }}></script>
     <script src={{ url_for('static', filename='./node_modules/urijs/src/jquery.URI.js') }}></script>
     <script src={{ url_for('static', filename='plots.js') }}></script>
-  </head>
-  <body>
+</head>
+<body>
     <div class="container">
-      <div id="chart" class="graph-container">
-        <svg id="graph-svg"/ class="graph-item">
-      </div>
+        <div id="chart-wrapper", class="graph-wrapper">
+            <div id="chart" class="graph-container">
+                <svg id="graph-svg" class="graph-item" />
+            </div>
+            <div id="graph-type" class="graph-options">
+                <select name="type">
+                    <option value="sorted">Sorted</option>
+                    <option value="regular">Regular</option>
+                    <option value="square">Square</option>
+                </select>
+            </div>
+            <div id="console" class="graph-console">
+                <h3>CONSOLE</h3>
+            </div>
+        </div>
     </div>
-    
-  </body>
+
+</body>
 </html>

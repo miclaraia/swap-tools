@@ -41,13 +41,57 @@ class API:
 
     @api('/data', 'data', ['GET', 'POST'])
     def get_data(self):
-        type_ = request.args.get('type', None)
+
+        def extrema(data):
+            s = {
+                'a': {
+                    'min': data['points'][0]['a'],
+                    'max': data['points'][0]['a'],
+                },
+                'b': {
+                    'min': data['points'][0]['b'],
+                    'max': data['points'][0]['b'],
+                }
+            }
+
+            def compare(item, key):
+                if item[key] > s[key]['max']:
+                    s[key]['max'] = item[key]
+                elif item[key] < s[key]['min']:
+                    s[key]['min'] = item[key]
+
+            for item in data['points']:
+                compare(item, 'a')
+                compare(item, 'b')
+
+            return s
+
+        # type_ = request.args.get('type', None)
         plot = request.args.get('plot', None)
 
-        return jsonify(DB().plots.get(plot, use_name=True))
+        data = DB().plots.get(plot, use_name=True)
+        stats = extrema(data)
 
-    @api('/plots/<experiment>/<type>', 'plots', ['GET'])
-    def index(self, experiment, type):
+        def norm(point, key):
+            return (point[key] - stats[key]['min']) / \
+                (stats[key]['max'] - stats[key]['min'])
+
+        def beta(point):
+            return norm(point, 'a') ** 2 + (norm(point, 'b')) ** 2
+
+        points = range(len(data['points']))
+        points = sorted(points, key=lambda i: beta(data['points'][i]))
+
+        data.update({
+            'ordering': {
+                'sorted': points,
+            }
+        })
+
+        return jsonify(data)
+
+    @api('/plots/<plot>', 'plots', ['GET'])
+    def index(self, plot):
         return render_template("index.html")
 
 # def get_data(self):
@@ -212,8 +256,8 @@ def plot_points_sorted(data):
 
 
 def override():
-    config.experiments.port = 27018
-    config.experiments.port = 27018
+    config.experiments.port = 27017
+    config.experiments.port = 27017
     config.database.name = 'swapDB'
 
     swap.db.DB._reset()
