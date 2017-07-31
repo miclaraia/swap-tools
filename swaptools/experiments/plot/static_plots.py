@@ -291,22 +291,59 @@ class Plots:
             ax, 'Consensus', 'Controversial',
             'Consensus and Controversial v Retired')
 
-    # @plot
-    # def plot_2d(self, ax, x_key, y_key, x_name, y_name):
-    #     data = []
-    #     for trial in self.trials:
-    #         x = self.navigate(trial, x_key)
-    #         y = self.navigate(trial, y_key)
-    #         data.append((x, y))
-    #
-    #     x, y = zip(*data)
-    #
-    #     self.pretty(
-    #         ax, x_name, y_name,
-    #         '%s v %s' % (x_name, y_name))
-    #     ax.scatter(x, y)
+    @plot
+    def plot_2d(self, ax, x_key, y_key, axes=None, title=None, s=10):
+        if axes is None:
+            axes={}
+
+        data = []
+        for trial in self.trials:
+            x = self.get_value(trial, x_key)
+            y = self.get_value(trial, y_key)
+            data.append((x, y))
+
+        x, y = zip(*data)
+        ax.scatter(x, y, s=s)
+
+        axes = self.axes(x_key, y_key, None, axes)
+        if title is None:
+            title = '%(x)s vs %(y)s' % axes
+        self.pretty(ax, axes['x'], axes['y'], title)
+
+    @plot
+    def plot_3d(self, ax, x_key, y_key, c_key, axes=None, title=None, s=15):
+        if axes is None:
+            axes={}
+
+        data = []
+        for trial in self.trials:
+            x = self.get_value(trial, x_key)
+            y = self.get_value(trial, y_key)
+            c = self.get_value(trial, c_key)
+            data.append((x, y, c))
+
+        x, y, c = zip(*data)
+        im = ax.scatter(x, y, c=c, s=s, cmap='viridis')
+        self.figure.colorbar(im, ax=ax)
+
+        axes = self.axes(x_key, y_key, c_key, axes)
+        if title is None:
+            title = '%(x)s and %(y)s vs %(c)s' % axes
+        self.pretty(ax, axes['x'], axes['y'], title)
 
     #############################################################
+
+    @staticmethod
+    def axes(x, y, c, axes):
+        if 'x' not in axes:
+            axes['x'] = x.split('.')[-1].title()
+        if 'y' not in axes:
+            axes['y'] = y.split('.')[-1].title()
+        if c is not None and 'c' not in axes:
+            axes['c'] = c.split('.')[-1].title()
+
+        return axes
+
 
     @staticmethod
     def pretty(ax, x, y, title):
@@ -315,13 +352,17 @@ class Plots:
         ax.set_title(title)
 
     @staticmethod
-    def navigate(trial, key):
-        key = key.split('.')
-        value = trial.__dict__
-        for k in key:
-            value = value[k]
+    def get_value(trial, key):
+        if key is not None:
+            if key == 'golds':
+                return len(trial.golds)
 
-        return value
+            key = key.split('.')
+            value = trial.__dict__
+            for k in key:
+                value = value[k]
+
+            return value
 
     def plot(self, func, *args, **kwargs):
         def inner(ax):
@@ -334,7 +375,10 @@ class Plots:
         self.figure = None
 
     def run(self):
-        fig = plt.figure(self.figures, figsize=(16, 9))
+        if self.fname is None:
+            fig = plt.figure(self.figures)
+        else:
+            fig = plt.figure(self.figures, figsize=(16, 9))
         self.figures += 1
         self.figure = fig
 
@@ -350,40 +394,71 @@ class Plots:
 
         if self.fname:
             plt.tight_layout()
-            plt.savefig(self.fname, dpi=200)
+            plt.savefig(self.fname, dpi=300)
         else:
             plt.show()
 
 
 def main():
-    p = Plots(0, 'plot-1.png')
+    p = Plots(0, None)
 
     # pylint: disable=E1120
-    p.golds_purity()
-    p.golds_completeness()
-    p.golds_retired()
-    p.golds_retired_correct()
-    p.run()
+    # p.plot_2d('golds', 'score_stats.purity')
+    # p.plot_2d('golds', 'score_stats.completeness')
+    # p.plot_2d('golds', 'score_stats.retired')
+    # p.plot_2d('golds', 'score_stats.retired_correct', {'y': 'Retired Correct'})
+    # p.plot_2d('golds', 'score_stats.tpr', {'y': 'TPR'})
+    # p.run()
+    #
+    # p.reset(None)
+    # p.plot_3d('gold_stats.controversial.mean', 'golds', 'score_stats.retired',
+    #           {'x': 'Controversial'})
+    # p.plot_3d('score_stats.purity', 'score_stats.completeness',
+    #           'golds')
+    # p.plot_3d('score_stats.purity', 'score_stats.completeness',
+    #           'score_stats.retired')
+    # p.plot_2d('score_stats.mdr', 'score_stats.fpr')
+    # p.run()
+    #
+    # p.reset(None)
+    # p.plot_3d('gold_stats.controversial.mean', 'gold_stats.consensus.mean',
+    #           'score_stats.purity',
+    #           {'x': 'Controversial', 'y': 'Consensus'})
+    # p.plot_3d('gold_stats.controversial.mean', 'gold_stats.consensus.mean',
+    #           'score_stats.completeness',
+    #           {'x': 'Controversial', 'y': 'Consensus'})
+    # p.plot_3d('gold_stats.controversial.mean', 'gold_stats.consensus.mean',
+    #           'score_stats.retired',
+    #           {'x': 'Controversial', 'y': 'Consensus'})
+    # p.run()
+    #
+    # p.reset(None)
 
-    p.reset('plot-2.png')
-    p.cv_golds_retired()
-    p.golds_retired_correct()
-    p.purity_completeness_golds()
-    p.purity_completeness_retired()
-    p.mdr_fpr()
-    p.run()
+    # p.plot_3d('score_stats.ncl_mean', 'golds', 'score_stats.retired',
+    #           {'x': 'NCL'})
+    # p.plot_3d('score_stats.ncl_mean', 'golds', 'score_stats.purity',
+    #           {'x': 'NCL'})
+    # p.plot_3d('score_stats.ncl_mean', 'golds', 'score_stats.completeness',
+    #           {'x': 'NCL'})
+    # p.run()
 
-    p.reset('plot-3.png')
-    p.cv_cn_purity()
-    p.cv_cn_completeness()
-    p.cv_cn_retired()
-    p.run()
-
-    p.reset('plot-4.png')
-    p.ncl_golds_retired_correct()
-    p.ncl_golds_retired()
-    p.ncl_golds_purity()
-    p.ncl_golds_completeness()
+    p.reset(None)
+    p.plot_2d('score_stats.ncl_mean','score_stats.retired_correct',
+              {'x': 'NCL',
+               'c': 'Retired Correct'})
+    p.plot_2d('golds', 'score_stats.retired_correct', {'c': 'Retired Correct'})
+    p.plot_3d('score_stats.ncl_mean', 'golds', 'score_stats.retired_correct',
+              {'x': 'NCL',
+               'c': 'Retired Correct'})
+    p.plot_3d('score_stats.ncl_mean', 'score_stats.retired_correct', 'golds',
+              {'x': 'NCL',
+               'y': 'Retired Correct'})
+    # p.plot_2d('score_stats.ncl_mean', 'golds', 'score_stats.retired',
+    #           {'x': 'NCL'})
+    # p.plot_2d('score_stats.ncl_mean', 'golds', 'score_stats.purity',
+    #           {'x': 'NCL'})
+    # p.plot_2d('score_stats.ncl_mean', 'golds', 'score_stats.completeness',
+    #           {'x': 'NCL'})
     p.run()
 
 
