@@ -49,7 +49,7 @@ class Trials(Collection):
         logger.info('getting trial %d', trial_id)
         cursor = self.collection.find({'trial': trial_id})
 
-        if cursor.hasNext():
+        if cursor.count() > 0:
             return cursor.next()
 
     def get_trials(self, experiment_id):
@@ -65,7 +65,6 @@ class Trials(Collection):
     def next_id(self):
         cursor = self.collection.find().sort('trial', -1).limit(1)
 
-        try:
-            return cursor.next()['trial'] + 1
-        except StopIteration:
+        if cursor.count() == 0:
             return 0
+        return cursor.next()['trial'] + 1

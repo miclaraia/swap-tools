@@ -46,11 +46,10 @@ class Trial:
                    thresholds, score_stats, gold_stats)
 
     @classmethod
-    def from_db(cls, trial_id):
-        data = DB().trials.get(trial_id)
+    def from_db(cls, trial_data):
         keys = ['experiment', 'trial', 'info', 'golds',
-                'thresholds', 'score_stats', ' gold_stats']
-        kwargs = {k: data[k] for k in keys}
+                'thresholds', 'score_stats', 'gold_stats']
+        kwargs = {k: trial_data[k] for k in keys}
 
         return cls(**kwargs)
 
@@ -80,7 +79,9 @@ class Trial:
     ###############################################################
 
     def __str__(self):
-        return str(self.dict())
+        d = self.dict()
+        d['golds'] = len(d['golds'])
+        return str(d)
 
     def __repr__(self):
         return str(self)

@@ -33,13 +33,12 @@ class Experiments(Collection):
     def get(self, experiment_id):
         cursor = self.collection.find({'experiment': experiment_id})
 
-        if cursor.hasNext():
+        if cursor.count() > 0:
             return cursor.next()
 
     def next_id(self):
         cursor = self.collection.find().sort('experiment', -1).limit(1)
 
-        try:
-            return cursor.next()['experiment'] + 1
-        except StopIteration:
+        if cursor.count() == 0:
             return 0
+        return cursor.next()['experiment'] + 1
