@@ -49,4 +49,4 @@ class Plots(Collection):
 
         if cursor.count() == 0:
             return 0
-        return cursor.next()['trial'] + 1
+        return cursor.next()['plot'] + 1
