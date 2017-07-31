@@ -18,7 +18,7 @@ class Plots:
 
     def __init__(self, experiment, fname):
         self.fname = fname
-        self.plots = []
+        self.plots = {0: []}
         self.figure = None
         # self.trials = list(Experiment.from_db(experiment).trials)
         e = Experiment.from_db(experiment)
@@ -101,35 +101,41 @@ class Plots:
     def plot(self, func, *args, **kwargs):
         def inner(ax):
             func(self, ax, *args, **kwargs)
-        self.plots.append(inner)
+        self.plots[self.figures].append(inner)
 
-    def reset(self, fname):
+    def reset(self):
         self.plots = []
-        self.fname = fname
         self.figure = None
 
-    def run(self):
-        if self.fname is None:
-            fig = plt.figure(self.figures)
-        else:
-            fig = plt.figure(self.figures, figsize=(16, 9))
+    def next(self):
         self.figures += 1
-        self.figure = fig
+        self.plots[self.figures] = []
 
-        x = math.ceil(math.sqrt(len(self.plots)))
-        y = math.ceil(len(self.plots) / x)
+    def run(self):
+        fname = self.fname
 
-        for i, func in enumerate(self.plots):
-            ax = fig.add_subplot(y, x, i + 1)
-            func(ax)
+        for i, plots in self.plots.items():
+            width = math.ceil(math.sqrt(len(plots)))
+            height = math.ceil(len(plots) / width)
 
-        plt.subplots_adjust(left=0.1, bottom=0.05, right=0.9, top=0.95,
-                            hspace=0.4, wspace=0.2)
+            if fname is None:
+                fig = plt.figure(i)
+            else:
+                fig = plt.figure(i, figsize=(16, 9))
 
-        if self.fname:
-            plt.tight_layout()
-            plt.savefig(self.fname, dpi=300)
-        else:
+            self.figure = fig
+            for j, func in enumerate(plots):
+                ax = fig.add_subplot(height, width, j + 1)
+                func(ax)
+
+            plt.subplots_adjust(left=0.1, bottom=0.05, right=0.9, top=0.95,
+                                hspace=0.4, wspace=0.2)
+
+            if fname is not None:
+                plt.savefig(fname % i, dpi=300)
+
+
+        if fname is None:
             plt.show()
 
 
