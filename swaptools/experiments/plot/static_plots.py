@@ -2,6 +2,7 @@
 from swaptools.experiments.db import DB
 from swaptools.experiments.experiment import Experiment
 
+import math
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -13,6 +14,7 @@ def plot(func):
 
 
 class Plots:
+    figures = 0
 
     def __init__(self, experiment, fname):
         self.fname = fname
@@ -161,6 +163,78 @@ class Plots:
                     'Purity and Completeness vs Retired')
 
     @plot
+    def ncl_golds_retired_correct(self, ax):
+        data = []
+        for trial in self.trials:
+            x = trial.score_stats['ncl_mean']
+            c = len(trial.golds)
+            y = trial.score_stats['retired_correct']
+
+            data.append((x, y, c))
+
+        x, y, c = zip(*data)
+
+        im = ax.scatter(x, y, c=c, s=15, cmap='viridis')
+        self.figure.colorbar(im, ax=ax)
+
+        self.pretty(ax, 'Number of Classifications', 'Retired Correct',
+                    'NCL and Retired Correct vs Golds')
+
+    @plot
+    def ncl_golds_retired(self, ax):
+        data = []
+        for trial in self.trials:
+            x = trial.score_stats['ncl_mean']
+            c = len(trial.golds)
+            y = trial.score_stats['retired']
+
+            data.append((x, y, c))
+
+        x, y, c = zip(*data)
+
+        im = ax.scatter(x, y, c=c, s=15, cmap='viridis')
+        self.figure.colorbar(im, ax=ax)
+
+        self.pretty(ax, 'Number of Classifications', 'Retired',
+                    'NCL and Retired vs Golds')
+
+    @plot
+    def ncl_golds_purity(self, ax):
+        data = []
+        for trial in self.trials:
+            x = trial.score_stats['ncl_mean']
+            c = len(trial.golds)
+            y = trial.score_stats['purity']
+
+            data.append((x, y, c))
+
+        x, y, c = zip(*data)
+
+        im = ax.scatter(x, y, c=c, s=15, cmap='viridis')
+        self.figure.colorbar(im, ax=ax)
+
+        self.pretty(ax, 'Number of Classifications', 'Purity',
+                    'NCL and Purity vs Golds')
+
+    @plot
+    def ncl_golds_completeness(self, ax):
+        data = []
+        for trial in self.trials:
+            x = trial.score_stats['ncl_mean']
+            c = len(trial.golds)
+            y = trial.score_stats['completeness']
+
+            data.append((x, y, c))
+
+        x, y, c = zip(*data)
+
+        im = ax.scatter(x, y, c=c, s=15, cmap='viridis')
+        self.figure.colorbar(im, ax=ax)
+
+        self.pretty(ax, 'Number of Classifications', 'Completeness',
+                    'NCL and Completeness vs Golds')
+
+    @plot
     def cv_cn_purity(self, ax):
         data = []
         for trial in self.trials:
@@ -172,7 +246,7 @@ class Plots:
 
         x, y, c = zip(*data)
 
-        im = ax.scatter(x, y, c=c, s=5, cmap='viridis')
+        im = ax.scatter(x, y, c=c, s=15, cmap='viridis')
         self.figure.colorbar(im, ax=ax)
 
         self.pretty(
@@ -191,7 +265,7 @@ class Plots:
 
         x, y, c = zip(*data)
 
-        im = ax.scatter(x, y, c=c, cmap='viridis')
+        im = ax.scatter(x, y, c=c, s=15, cmap='viridis')
         self.figure.colorbar(im, ax=ax)
 
         self.pretty(
@@ -210,7 +284,7 @@ class Plots:
 
         x, y, c = zip(*data)
 
-        im = ax.scatter(x, y, c=c, cmap='viridis')
+        im = ax.scatter(x, y, c=c, s=15, cmap='viridis')
         self.figure.colorbar(im, ax=ax)
 
         self.pretty(
@@ -254,40 +328,62 @@ class Plots:
             func(self, ax, *args, **kwargs)
         self.plots.append(inner)
 
+    def reset(self, fname):
+        self.plots = []
+        self.fname = fname
+        self.figure = None
+
     def run(self):
-        fig = plt.figure(1)
+        fig = plt.figure(self.figures, figsize=(16, 9))
+        self.figures += 1
         self.figure = fig
-        j = len(self.plots)
+
+        x = math.ceil(math.sqrt(len(self.plots)))
+        y = math.ceil(len(self.plots) / x)
+
         for i, func in enumerate(self.plots):
-            ax = fig.add_subplot(3, 3, i + 1)
+            ax = fig.add_subplot(y, x, i + 1)
             func(ax)
 
         plt.subplots_adjust(left=0.1, bottom=0.05, right=0.9, top=0.95,
                             hspace=0.4, wspace=0.2)
 
         if self.fname:
-            plt.savefig(self.fname, dpi=300)
+            plt.tight_layout()
+            plt.savefig(self.fname, dpi=200)
         else:
             plt.show()
 
 
 def main():
-    p = Plots(0, None)
+    p = Plots(0, 'plot-1.png')
 
     # pylint: disable=E1120
     p.golds_purity()
     p.golds_completeness()
     p.golds_retired()
-    p.golds_gamma()
+    p.golds_retired_correct()
+    p.run()
+
+    p.reset('plot-2.png')
     p.cv_golds_retired()
     p.golds_retired_correct()
     p.purity_completeness_golds()
     p.purity_completeness_retired()
     p.mdr_fpr()
-    # p.cv_cn_purity()
-    # p.cv_cn_completeness()
-    # p.cv_cn_retired()
+    p.run()
 
+    p.reset('plot-3.png')
+    p.cv_cn_purity()
+    p.cv_cn_completeness()
+    p.cv_cn_retired()
+    p.run()
+
+    p.reset('plot-4.png')
+    p.ncl_golds_retired_correct()
+    p.ncl_golds_retired()
+    p.ncl_golds_purity()
+    p.ncl_golds_completeness()
     p.run()
 
 
