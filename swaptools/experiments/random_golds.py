@@ -21,7 +21,8 @@ class RandomGolds(Experiment):
 
         self.trial_info.update({'golds': 0})
 
-    def info_key_order(self):
+    @staticmethod
+    def info_key_order():
         return ['n', 'golds']
 
     @classmethod
@@ -44,7 +45,8 @@ class RandomGolds(Experiment):
 
     def setup(self):
         super().setup()
-        self.trial_info['golds'] = self.num_golds[0]
+        golds = self.num_golds[0] - self.num_golds[2]
+        self.trial_info['golds'] = golds
 
     def setup_next(self):
         super().setup_next()
