@@ -45,8 +45,7 @@ class RandomGolds(Experiment):
 
     def setup(self):
         super().setup()
-        golds = self.num_golds[0] - self.num_golds[2]
-        self.trial_info['golds'] = golds
+        self.trial_info['golds'] = self.num_golds[0]
 
     def setup_next(self):
         super().setup_next()
