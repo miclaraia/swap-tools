@@ -139,6 +139,32 @@ class Plotter:
         if fname is None:
             plt.show()
 
+    #########################################################################
+    ## Default plots
+    # pylint: disable=E1120
+
+    def plot_standard(self, standard):
+        self.next()
+        self.plot_3d('thresholds.0', 'thresholds.1', 'score_stats.retired',
+                     {'x': 'Bogus Threshold',
+                      'y': 'Real Threshold'})
+        self.plot_3d('thresholds.0', 'thresholds.1',
+                     'score_stats.retired_correct',
+                     {'x': 'Bogus Threshold',
+                      'y': 'Real Threshold'})
+        self.plot_3d('thresholds.0', 'thresholds.1', 'score_stats.purity',
+                     {'x': 'Bogus Threshold',
+                      'y': 'Real Threshold'})
+        self.plot_3d('thresholds.0', 'thresholds.1', 'score_stats.completeness',
+                     {'x': 'Bogus Threshold',
+                      'y': 'Real Threshold'})
+
+        self.next()
+        self.plot_3d('score_stats.fnr', 'score_stats.fpr', standard)
+        self.plot_3d('score_stats.tpr', 'score_stats.tnr', standard)
+        self.plot_3d('score_stats.tpr', 'score_stats.fnr', standard)
+        self.plot_3d('score_stats.tnr', 'score_stats.fpr', standard)
+
 
 # def main():
 #     e = Experiment.from_db(1)
