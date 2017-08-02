@@ -52,8 +52,119 @@ class RandomGolds(Experiment):
         self.gg.reset()
         self.gg.random(info['golds'])
 
+    def _plot(self, p):
+        p.plot_2d('golds', 'score_stats.purity')
+        p.plot_2d('golds', 'score_stats.completeness')
+        p.plot_2d('golds', 'score_stats.retired')
+        p.plot_2d('golds', 'score_stats.retired_correct',
+                  {'y': 'Retired Correct'})
+        p.plot_2d('golds', 'score_stats.tpr', {'y': 'TPR'})
+        p.plot_3d('thresholds.0', 'thresholds.1', 'golds',
+                  {'x': 'Bogus Threshold',
+                   'y': 'Real Threshold'})
+
+        p.next()
+        p.plot_3d('gold_stats.controversial.mean', 'golds',
+                  'score_stats.retired',
+                  {'x': 'Controversial'})
+        p.plot_3d('score_stats.purity', 'score_stats.completeness',
+                  'golds')
+        p.plot_3d('score_stats.purity', 'score_stats.completeness',
+                  'score_stats.retired')
+        p.plot_2d('score_stats.fnr', 'score_stats.fpr')
+        p.plot_3d('score_stats.retired', 'score_stats.retired_correct',
+                  'score_stats.purity')
+
+        p.next()
+        p.plot_3d('gold_stats.true', 'gold_stats.false', 'score_stats.purity')
+        p.plot_2d('gold_stats.fraction', 'score_stats.purity')
+        p.plot_2d('gold_stats.fraction', 'score_stats.completeness')
+        p.plot_2d('gold_stats.fraction', 'score_stats.retired')
+
+        p.next()
+        p.plot_3d('thresholds.0', 'thresholds.1', 'score_stats.retired',
+                  {'x': 'Bogus Threshold',
+                   'y': 'Real Threshold'})
+        p.plot_3d('thresholds.0', 'thresholds.1', 'score_stats.retired_correct',
+                  {'x': 'Bogus Threshold',
+                   'y': 'Real Threshold'})
+        p.plot_3d('thresholds.0', 'thresholds.1', 'score_stats.purity',
+                  {'x': 'Bogus Threshold',
+                   'y': 'Real Threshold'})
+        p.plot_3d('thresholds.0', 'thresholds.1', 'score_stats.completeness',
+                  {'x': 'Bogus Threshold',
+                   'y': 'Real Threshold'})
+
+        p.next()
+        p.plot_3d('score_stats.fnr', 'score_stats.fpr', 'golds')
+        p.plot_3d('score_stats.tpr', 'score_stats.tnr', 'golds')
+        p.plot_3d('score_stats.tpr', 'score_stats.fnr', 'golds')
+        p.plot_3d('score_stats.tnr', 'score_stats.fpr', 'golds')
+
+        p.next()
+        p.plot_3d('gold_stats.controversial.mean', 'gold_stats.consensus.mean',
+                  'score_stats.purity',
+                  {'x': 'Controversial', 'y': 'Consensus'})
+        p.plot_3d('gold_stats.controversial.mean', 'gold_stats.consensus.mean',
+                  'score_stats.completeness',
+                  {'x': 'Controversial', 'y': 'Consensus'})
+        p.plot_3d('gold_stats.controversial.mean', 'gold_stats.consensus.mean',
+                  'score_stats.retired',
+                  {'x': 'Controversial', 'y': 'Consensus'})
+        p.plot_3d('gold_stats.controversial.mean', 'gold_stats.consensus.mean',
+                  'golds',
+                  {'x': 'Controversial', 'y': 'Consensus'})
+        p.plot_3d('gold_stats.controversial.mean', 'gold_stats.consensus.mean',
+                  'score_stats.ncl_mean',
+                  {'x': 'Controversial', 'y': 'Consensus', 'c': 'NCL'})
+
+        p.next()
+        p.plot_2d('score_stats.ncl_mean', 'score_stats.retired_correct',
+                  {'x': 'NCL',
+                   'c': 'Retired Correct'})
+        p.plot_2d('golds', 'score_stats.retired_correct',
+                  {'c': 'Retired Correct'})
+        p.plot_3d('score_stats.ncl_mean', 'golds',
+                  'score_stats.retired_correct',
+                  {'x': 'NCL',
+                   'c': 'Retired Correct'})
+        p.plot_3d('score_stats.ncl_mean', 'score_stats.retired_correct',
+                  'golds',
+                  {'x': 'NCL',
+                   'y': 'Retired Correct'})
+
+        p.next()
+        p.plot_2d('score_stats.ncl_mean', 'score_stats.retired',
+                  {'x': 'NCL'})
+        p.plot_2d('golds', 'score_stats.retired')
+        p.plot_3d('score_stats.ncl_mean', 'golds', 'score_stats.retired',
+                  {'x': 'NCL'})
+        p.plot_3d('score_stats.ncl_mean', 'score_stats.retired', 'golds',
+                  {'x': 'NCL'})
+
+        p.next()
+        p.plot_2d('score_stats.ncl_mean', 'score_stats.purity',
+                  {'x': 'NCL'})
+        p.plot_2d('golds', 'score_stats.purity')
+        p.plot_3d('score_stats.ncl_mean', 'golds', 'score_stats.purity',
+                  {'x': 'NCL'})
+        p.plot_3d('score_stats.ncl_mean', 'score_stats.purity', 'golds',
+                  {'x': 'NCL'})
+
+        p.next()
+        p.plot_2d('score_stats.ncl_mean', 'score_stats.completeness',
+                  {'x': 'NCL'})
+        p.plot_2d('golds', 'score_stats.completeness')
+        p.plot_3d('score_stats.ncl_mean', 'golds', 'score_stats.completeness',
+                  {'x': 'NCL'})
+        p.plot_3d('score_stats.ncl_mean', 'score_stats.completeness', 'golds',
+                  {'x': 'NCL'})
+        p.run()
+
 
 class Interface(_Interface):
+
+    _experiment = RandomGolds
 
     @property
     def command(self):

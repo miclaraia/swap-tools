@@ -1,8 +1,9 @@
 
-from swaptools.experiments.experiment import Experiment
+# from swaptools.experiments.experiment import Experiment
 
 import math
 import matplotlib.pyplot as plt
+import seaborn
 
 
 def plot(func):
@@ -91,6 +92,8 @@ class Plotter:
             key = key.split('.')
             value = trial.__dict__
             for k in key:
+                if type(value) in [list, tuple]:
+                    k = int(k)
                 value = value[k]
 
             return value
@@ -110,6 +113,7 @@ class Plotter:
 
     def run(self):
         fname = self.fname
+        seaborn.reset_orig()
 
         for i, plots in self.plots.items():
             width = math.ceil(math.sqrt(len(plots)))
@@ -136,83 +140,83 @@ class Plotter:
             plt.show()
 
 
-def main():
-    e = Experiment.from_db(1)
-    p = Plotter(e, 'output/plots-gamma-%d')
-
-    # pylint: disable=E1120
-    p.plot_2d('info.gamma', 'score_stats.purity')
-    p.plot_2d('info.gamma', 'score_stats.completeness')
-    p.plot_2d('info.gamma', 'score_stats.retired')
-    p.plot_2d('info.gamma', 'score_stats.retired_correct', {'y': 'Retired Correct'})
-    p.plot_2d('info.gamma', 'score_stats.tpr', {'y': 'TPR'})
-
-    p.next()
-    p.plot_3d('gold_stats.controversial.mean', 'info.gamma', 'score_stats.retired',
-              {'x': 'Controversial'})
-    p.plot_3d('score_stats.purity', 'score_stats.completeness',
-              'info.gamma')
-    p.plot_3d('score_stats.purity', 'score_stats.completeness',
-              'score_stats.retired')
-    p.plot_2d('score_stats.mdr', 'score_stats.fpr')
-
-    p.next()
-    p.plot_3d('gold_stats.controversial.mean', 'gold_stats.consensus.mean',
-              'score_stats.purity',
-              {'x': 'Controversial', 'y': 'Consensus'})
-    p.plot_3d('gold_stats.controversial.mean', 'gold_stats.consensus.mean',
-              'score_stats.completeness',
-              {'x': 'Controversial', 'y': 'Consensus'})
-    p.plot_3d('gold_stats.controversial.mean', 'gold_stats.consensus.mean',
-              'score_stats.retired',
-              {'x': 'Controversial', 'y': 'Consensus'})
-    p.plot_3d('gold_stats.controversial.mean', 'gold_stats.consensus.mean',
-              'info.gamma',
-              {'x': 'Controversial', 'y': 'Consensus'})
-    p.plot_3d('gold_stats.controversial.mean', 'gold_stats.consensus.mean',
-              'score_stats.ncl_mean',
-              {'x': 'Controversial', 'y': 'Consensus', 'c': 'NCL'})
-
-    p.next()
-    p.plot_2d('score_stats.ncl_mean','score_stats.retired_correct',
-              {'x': 'NCL',
-               'c': 'Retired Correct'})
-    p.plot_2d('info.gamma', 'score_stats.retired_correct', {'c': 'Retired Correct'})
-    p.plot_3d('score_stats.ncl_mean', 'info.gamma', 'score_stats.retired_correct',
-              {'x': 'NCL',
-               'c': 'Retired Correct'})
-    p.plot_3d('score_stats.ncl_mean', 'score_stats.retired_correct', 'info.gamma',
-              {'x': 'NCL',
-               'y': 'Retired Correct'})
-
-    p.next()
-    p.plot_2d('score_stats.ncl_mean', 'score_stats.retired',
-              {'x': 'NCL'})
-    p.plot_2d('info.gamma', 'score_stats.retired')
-    p.plot_3d('score_stats.ncl_mean', 'info.gamma', 'score_stats.retired',
-              {'x': 'NCL'})
-    p.plot_3d('score_stats.ncl_mean', 'score_stats.retired', 'info.gamma',
-              {'x': 'NCL'})
-
-    p.next()
-    p.plot_2d('score_stats.ncl_mean', 'score_stats.purity',
-              {'x': 'NCL'})
-    p.plot_2d('info.gamma', 'score_stats.purity')
-    p.plot_3d('score_stats.ncl_mean', 'info.gamma', 'score_stats.purity',
-              {'x': 'NCL'})
-    p.plot_3d('score_stats.ncl_mean', 'score_stats.purity', 'info.gamma',
-              {'x': 'NCL'})
-
-    p.next()
-    p.plot_2d('score_stats.ncl_mean', 'score_stats.completeness',
-              {'x': 'NCL'})
-    p.plot_2d('info.gamma', 'score_stats.completeness')
-    p.plot_3d('score_stats.ncl_mean', 'info.gamma', 'score_stats.completeness',
-              {'x': 'NCL'})
-    p.plot_3d('score_stats.ncl_mean', 'score_stats.completeness', 'info.gamma',
-              {'x': 'NCL'})
-    p.run()
-
-
-if __name__ == '__main__':
-    main()
+# def main():
+#     e = Experiment.from_db(1)
+#     p = Plotter(e, 'output/plots-gamma-%d')
+#
+#     # pylint: disable=E1120
+#     p.plot_2d('info.gamma', 'score_stats.purity')
+#     p.plot_2d('info.gamma', 'score_stats.completeness')
+#     p.plot_2d('info.gamma', 'score_stats.retired')
+#     p.plot_2d('info.gamma', 'score_stats.retired_correct', {'y': 'Retired Correct'})
+#     p.plot_2d('info.gamma', 'score_stats.tpr', {'y': 'TPR'})
+#
+#     p.next()
+#     p.plot_3d('gold_stats.controversial.mean', 'info.gamma', 'score_stats.retired',
+#               {'x': 'Controversial'})
+#     p.plot_3d('score_stats.purity', 'score_stats.completeness',
+#               'info.gamma')
+#     p.plot_3d('score_stats.purity', 'score_stats.completeness',
+#               'score_stats.retired')
+#     p.plot_2d('score_stats.mdr', 'score_stats.fpr')
+#
+#     p.next()
+#     p.plot_3d('gold_stats.controversial.mean', 'gold_stats.consensus.mean',
+#               'score_stats.purity',
+#               {'x': 'Controversial', 'y': 'Consensus'})
+#     p.plot_3d('gold_stats.controversial.mean', 'gold_stats.consensus.mean',
+#               'score_stats.completeness',
+#               {'x': 'Controversial', 'y': 'Consensus'})
+#     p.plot_3d('gold_stats.controversial.mean', 'gold_stats.consensus.mean',
+#               'score_stats.retired',
+#               {'x': 'Controversial', 'y': 'Consensus'})
+#     p.plot_3d('gold_stats.controversial.mean', 'gold_stats.consensus.mean',
+#               'info.gamma',
+#               {'x': 'Controversial', 'y': 'Consensus'})
+#     p.plot_3d('gold_stats.controversial.mean', 'gold_stats.consensus.mean',
+#               'score_stats.ncl_mean',
+#               {'x': 'Controversial', 'y': 'Consensus', 'c': 'NCL'})
+#
+#     p.next()
+#     p.plot_2d('score_stats.ncl_mean','score_stats.retired_correct',
+#               {'x': 'NCL',
+#                'c': 'Retired Correct'})
+#     p.plot_2d('info.gamma', 'score_stats.retired_correct', {'c': 'Retired Correct'})
+#     p.plot_3d('score_stats.ncl_mean', 'info.gamma', 'score_stats.retired_correct',
+#               {'x': 'NCL',
+#                'c': 'Retired Correct'})
+#     p.plot_3d('score_stats.ncl_mean', 'score_stats.retired_correct', 'info.gamma',
+#               {'x': 'NCL',
+#                'y': 'Retired Correct'})
+#
+#     p.next()
+#     p.plot_2d('score_stats.ncl_mean', 'score_stats.retired',
+#               {'x': 'NCL'})
+#     p.plot_2d('info.gamma', 'score_stats.retired')
+#     p.plot_3d('score_stats.ncl_mean', 'info.gamma', 'score_stats.retired',
+#               {'x': 'NCL'})
+#     p.plot_3d('score_stats.ncl_mean', 'score_stats.retired', 'info.gamma',
+#               {'x': 'NCL'})
+#
+#     p.next()
+#     p.plot_2d('score_stats.ncl_mean', 'score_stats.purity',
+#               {'x': 'NCL'})
+#     p.plot_2d('info.gamma', 'score_stats.purity')
+#     p.plot_3d('score_stats.ncl_mean', 'info.gamma', 'score_stats.purity',
+#               {'x': 'NCL'})
+#     p.plot_3d('score_stats.ncl_mean', 'score_stats.purity', 'info.gamma',
+#               {'x': 'NCL'})
+#
+#     p.next()
+#     p.plot_2d('score_stats.ncl_mean', 'score_stats.completeness',
+#               {'x': 'NCL'})
+#     p.plot_2d('info.gamma', 'score_stats.completeness')
+#     p.plot_3d('score_stats.ncl_mean', 'info.gamma', 'score_stats.completeness',
+#               {'x': 'NCL'})
+#     p.plot_3d('score_stats.ncl_mean', 'score_stats.completeness', 'info.gamma',
+#               {'x': 'NCL'})
+#     p.run()
+#
+#
+# if __name__ == '__main__':
+#     main()

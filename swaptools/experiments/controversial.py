@@ -67,6 +67,8 @@ class Controversial(Experiment):
 
 class Interface(_Interface):
 
+    _experiment = Controversial
+
     @property
     def command(self):
         """
@@ -84,13 +86,17 @@ class Interface(_Interface):
         super().options(parser)
 
         parser.add_argument(
-            '--num-golds', nargs=1, required=True)
+            '--num-golds', nargs=1)
 
         parser.add_argument(
-            '--controversial', nargs=3, required=True)
+            '--controversial', nargs=3)
 
         parser.add_argument(
-            '--consensus', nargs=3, required=True)
+            '--consensus', nargs=3)
+
+    @staticmethod
+    def required():
+        return ['num_golds', 'controversial', 'consensus']
 
     @staticmethod
     def run(name, description, args):

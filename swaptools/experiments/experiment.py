@@ -116,7 +116,7 @@ class Experiment:
         else:
             self.trial_info['n'] += 1
 
-    def _plot(self, plot):
+    def _plot(self, p):
         pass
 
     @staticmethod
@@ -170,6 +170,10 @@ class Experiment:
                     self.id, len(self._trials))
 
     def plot(self, fname):
+        for trial in self.trials:
+            g = trial.gold_stats
+            g['fraction'] = g['true'] / g['total']
+
         plotter = Plotter(self, fname)
         self._plot(plotter)
 
@@ -252,6 +256,8 @@ class Interace(ui.Interface):
     Designed to be subclassed and overriden
     """
 
+    _experiment = Experiment
+
     def options(self, parser):
         """
         Add options to the parser
@@ -262,11 +268,27 @@ class Interace(ui.Interface):
         parser.add_argument(
             '--shell', action='store_true')
 
-        parser.add_argument('name', nargs=1)
-        parser.add_argument('description', nargs=1)
+        parser.add_argument(
+            '--plot', nargs=2,
+            metavar=('experiment', 'fname'),
+            help='Plot experiment stored in db'
+        )
+
+        parser.add_argument('--name', nargs=1)
+        parser.add_argument('--description', nargs=1)
+
+    def required(self):
+        pass
 
     def run(self, name, description, args):
         pass
+
+    @staticmethod
+    def _required(required, args):
+        args = args.__dict__
+        for r in required:
+            if not args[r]:
+                raise Exception
 
     def call(self, args):
         """
@@ -274,9 +296,18 @@ class Interace(ui.Interface):
         """
         experiment = None
         if args.run:
+            r = ['name', 'desc'] + self.required()
+            self._required(r, args)
+
             name = args.name[0]
             desc = args.description[0]
             experiment = self.run(name, desc, args)
+
+        if args.plot:
+            experiment_id = int(args.plot[0])
+            fname = self.f(args.plot[1])
+            e = self._experiment.from_db(experiment_id)
+            e.plot(fname)
 
         if args.shell:
             assert experiment
