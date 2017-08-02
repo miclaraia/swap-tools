@@ -34,7 +34,7 @@ class Controversial(Experiment):
         super().setup()
         info = self.trial_info
         info.update({
-            'cv': self.num_cv[0],
+            'cv': self.num_cv[0] - self.num_cv[2],
             'cn': self.num_cn[0]
         })
 
@@ -49,11 +49,10 @@ class Controversial(Experiment):
         super().setup_next()
         info = self.trial_info
 
-        if info['cv'] >= self.num_cv[1]:
+        info['cv'] += self.num_cv[2]
+        if info['cv'] > self.num_cv[1]:
             info['cv'] = self.num_cv[0]
             info['cn'] += self.num_cn[2]
-        else:
-            info['cv'] += self.num_cv[2]
 
         logger.info('trial: %s', str(info))
         gg = self.gg
