@@ -54,7 +54,6 @@ class Controversial(Experiment):
             info['cv'] = self.num_cv[0]
             info['cn'] += self.num_cn[2]
 
-        logger.info('trial: %s', str(info))
         gg = self.gg
         gg.reset()
         gg.these(self._golds['seed'])
@@ -62,6 +61,7 @@ class Controversial(Experiment):
         gg.subjects(self._golds['cn'][:info['cn']])
 
         info['golds'] = len(gg.golds)
+        logger.info('trial: %s', str(info))
 
         logger.info('using %d golds', len(gg.golds))
 
