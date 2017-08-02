@@ -1,7 +1,6 @@
 
 from swaptools.experiments.experiment import Experiment
 from swaptools.experiments.experiment import Interace as _Interface
-from swaptools.experiments.db import DB
 
 import logging
 
@@ -24,11 +23,6 @@ class RandomGolds(Experiment):
     @staticmethod
     def info_key_order():
         return ['n', 'golds']
-
-    @classmethod
-    def new(cls, *args, **kwargs):
-        kwargs['experiment'] = DB().experiments.next_id()
-        return cls(*args, **kwargs)
 
     def has_next(self):
         n = self.trial_info['n']

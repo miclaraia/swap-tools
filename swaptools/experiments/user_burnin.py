@@ -3,7 +3,6 @@ import swap.config as config
 
 from swaptools.experiments.experiment import Experiment
 from swaptools.experiments.experiment import Interace as _Interface
-from swaptools.experiments.db import DB
 
 import logging
 
@@ -22,11 +21,6 @@ class UserBurnin(Experiment):
     @staticmethod
     def info_key_order():
         return ['n', 'gamma']
-
-    @classmethod
-    def new(cls, *args, **kwargs):
-        kwargs['experiment'] = DB().experiments.next_id()
-        return cls(*args, **kwargs)
 
     def has_next(self):
         gamma = self.trial_info['gamma']

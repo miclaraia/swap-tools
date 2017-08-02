@@ -31,11 +31,6 @@ class Trial:
 
     ###############################################################
 
-    def plot(self):
-        pass
-
-    ###############################################################
-
     @classmethod
     def generate(cls, experiment, trial, info, golds, score_export):
         score_stats = score_export.stats.dict()
@@ -102,19 +97,12 @@ class Experiment:
         self.gg = GoldGetter()
 
     ###############################################################
+    ## Override
 
     def setup(self):
         logger.info('Setting up')
         config.back_update = False
         self.control = self._init_control()
-
-    @property
-    def thresholds(self):
-        history = self.control.swap.history
-        thresholds = history.score_export().thresholds
-        logger.info('Using thresholds %s', str(thresholds))
-
-        return thresholds
 
     @staticmethod
     def has_next():
@@ -126,6 +114,25 @@ class Experiment:
             self.trial_info['n'] = 0
         else:
             self.trial_info['n'] += 1
+
+    @staticmethod
+    def _init_control():
+        return Control()
+
+    @staticmethod
+    def info_key_order():
+        # TODO not actually being used yet
+        return ['n', 'golds']
+
+    ###############################################################
+
+    @property
+    def thresholds(self):
+        history = self.control.swap.history
+        thresholds = history.score_export().thresholds
+        logger.info('Using thresholds %s', str(thresholds))
+
+        return thresholds
 
     def _run(self):
         logger.info('Running trial')
@@ -167,12 +174,6 @@ class Experiment:
 
     ###############################################################
 
-    @staticmethod
-    def _init_control():
-        return Control()
-
-    ###############################################################
-
     @classmethod
     def from_db(cls, experiment_id):
         data = DB().experiments.get(experiment_id)
@@ -190,6 +191,11 @@ class Experiment:
     def generate(cls, name, description):
         experiment = DB().experiments.next_id()
         return cls(experiment, name, description)
+
+    @classmethod
+    def new(cls, *args, **kwargs):
+        kwargs['experiment'] = DB().experiments.next_id()
+        return cls(*args, **kwargs)
 
     @property
     def trials(self):
