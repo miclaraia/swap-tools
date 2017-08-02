@@ -53,13 +53,11 @@ class GoldProportions(Experiment):
         info = self.trial_info
         if info['n'] >= self.num_trials:
             info['n'] = 0
+            info['real'] += self.num_real[2]
 
-            if info['real'] >= self.num_real[1]:
+            if info['real'] > self.num_real[1]:
                 info['real'] = self.num_real[0]
-            else:
-                info['real'] += self.num_real[2]
-
-        info['bogus'] += self.num_bogus[2]
+                info['bogus'] += self.num_bogus[2]
 
         logger.info('%s %s', str(info), str(self.num_trials))
         self.gg.reset()
@@ -82,7 +80,7 @@ class Interface(_Interface):
         For example, this would return 'swap' for SWAPInterface
         and 'roc' for RocInterface
         """
-        return 'godlprop'
+        return 'goldprop'
 
     def options(self, parser):
         """
