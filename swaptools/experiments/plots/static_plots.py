@@ -140,20 +140,20 @@ class Plots:
 
 
 def main():
-    p = Plots(0, 'output/plots-%d')
+    p = Plots(1, 'output/plots-gamma-%d')
 
     # pylint: disable=E1120
-    p.plot_2d('golds', 'score_stats.purity')
-    p.plot_2d('golds', 'score_stats.completeness')
-    p.plot_2d('golds', 'score_stats.retired')
-    p.plot_2d('golds', 'score_stats.retired_correct', {'y': 'Retired Correct'})
-    p.plot_2d('golds', 'score_stats.tpr', {'y': 'TPR'})
+    p.plot_2d('info.gamma', 'score_stats.purity')
+    p.plot_2d('info.gamma', 'score_stats.completeness')
+    p.plot_2d('info.gamma', 'score_stats.retired')
+    p.plot_2d('info.gamma', 'score_stats.retired_correct', {'y': 'Retired Correct'})
+    p.plot_2d('info.gamma', 'score_stats.tpr', {'y': 'TPR'})
 
     p.next()
-    p.plot_3d('gold_stats.controversial.mean', 'golds', 'score_stats.retired',
+    p.plot_3d('gold_stats.controversial.mean', 'info.gamma', 'score_stats.retired',
               {'x': 'Controversial'})
     p.plot_3d('score_stats.purity', 'score_stats.completeness',
-              'golds')
+              'info.gamma')
     p.plot_3d('score_stats.purity', 'score_stats.completeness',
               'score_stats.retired')
     p.plot_2d('score_stats.mdr', 'score_stats.fpr')
@@ -169,7 +169,7 @@ def main():
               'score_stats.retired',
               {'x': 'Controversial', 'y': 'Consensus'})
     p.plot_3d('gold_stats.controversial.mean', 'gold_stats.consensus.mean',
-              'golds',
+              'info.gamma',
               {'x': 'Controversial', 'y': 'Consensus'})
     p.plot_3d('gold_stats.controversial.mean', 'gold_stats.consensus.mean',
               'score_stats.ncl_mean',
@@ -179,39 +179,39 @@ def main():
     p.plot_2d('score_stats.ncl_mean','score_stats.retired_correct',
               {'x': 'NCL',
                'c': 'Retired Correct'})
-    p.plot_2d('golds', 'score_stats.retired_correct', {'c': 'Retired Correct'})
-    p.plot_3d('score_stats.ncl_mean', 'golds', 'score_stats.retired_correct',
+    p.plot_2d('info.gamma', 'score_stats.retired_correct', {'c': 'Retired Correct'})
+    p.plot_3d('score_stats.ncl_mean', 'info.gamma', 'score_stats.retired_correct',
               {'x': 'NCL',
                'c': 'Retired Correct'})
-    p.plot_3d('score_stats.ncl_mean', 'score_stats.retired_correct', 'golds',
+    p.plot_3d('score_stats.ncl_mean', 'score_stats.retired_correct', 'info.gamma',
               {'x': 'NCL',
                'y': 'Retired Correct'})
 
     p.next()
     p.plot_2d('score_stats.ncl_mean', 'score_stats.retired',
               {'x': 'NCL'})
-    p.plot_2d('golds', 'score_stats.retired')
-    p.plot_3d('score_stats.ncl_mean', 'golds', 'score_stats.retired',
+    p.plot_2d('info.gamma', 'score_stats.retired')
+    p.plot_3d('score_stats.ncl_mean', 'info.gamma', 'score_stats.retired',
               {'x': 'NCL'})
-    p.plot_3d('score_stats.ncl_mean', 'score_stats.retired', 'golds',
+    p.plot_3d('score_stats.ncl_mean', 'score_stats.retired', 'info.gamma',
               {'x': 'NCL'})
 
     p.next()
     p.plot_2d('score_stats.ncl_mean', 'score_stats.purity',
               {'x': 'NCL'})
-    p.plot_2d('golds', 'score_stats.purity')
-    p.plot_3d('score_stats.ncl_mean', 'golds', 'score_stats.purity',
+    p.plot_2d('info.gamma', 'score_stats.purity')
+    p.plot_3d('score_stats.ncl_mean', 'info.gamma', 'score_stats.purity',
               {'x': 'NCL'})
-    p.plot_3d('score_stats.ncl_mean', 'score_stats.purity', 'golds',
+    p.plot_3d('score_stats.ncl_mean', 'score_stats.purity', 'info.gamma',
               {'x': 'NCL'})
 
     p.next()
     p.plot_2d('score_stats.ncl_mean', 'score_stats.completeness',
               {'x': 'NCL'})
-    p.plot_2d('golds', 'score_stats.completeness')
-    p.plot_3d('score_stats.ncl_mean', 'golds', 'score_stats.completeness',
+    p.plot_2d('info.gamma', 'score_stats.completeness')
+    p.plot_3d('score_stats.ncl_mean', 'info.gamma', 'score_stats.completeness',
               {'x': 'NCL'})
-    p.plot_3d('score_stats.ncl_mean', 'score_stats.completeness', 'golds',
+    p.plot_3d('score_stats.ncl_mean', 'score_stats.completeness', 'info.gamma',
               {'x': 'NCL'})
     p.run()
 
