@@ -61,6 +61,8 @@ class Controversial(Experiment):
         gg.subjects(self._golds['cv'][:info['cv']])
         gg.subjects(self._golds['cn'][:info['cn']])
 
+        info['golds'] = len(gg.golds)
+
         logger.info('using %d golds', len(gg.golds))
 
 
