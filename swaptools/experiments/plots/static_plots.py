@@ -1,9 +1,7 @@
 
-from swaptools.experiments.db import DB
 from swaptools.experiments.experiment import Experiment
 
 import math
-import numpy as np
 import matplotlib.pyplot as plt
 
 
