@@ -5,6 +5,7 @@ import swap.ui.ui as ui
 
 import swaptools.experiments.config as config
 from swaptools.experiments.db import DB
+from swaptools.experiments.plots import Plotter
 
 from collections import OrderedDict
 import code
@@ -97,7 +98,7 @@ class Experiment:
         self.gg = GoldGetter()
 
     ###############################################################
-    ## Override
+    ## Override by Experiment subclasses
 
     def setup(self):
         logger.info('Setting up')
@@ -115,6 +116,9 @@ class Experiment:
         else:
             self.trial_info['n'] += 1
 
+    def _plot(self, plot):
+        pass
+
     @staticmethod
     def _init_control():
         return Control()
@@ -125,14 +129,7 @@ class Experiment:
         return ['n', 'golds']
 
     ###############################################################
-
-    @property
-    def thresholds(self):
-        history = self.control.swap.history
-        thresholds = history.score_export().thresholds
-        logger.info('Using thresholds %s', str(thresholds))
-
-        return thresholds
+    ## Running the experiment
 
     def _run(self):
         logger.info('Running trial')
@@ -172,6 +169,10 @@ class Experiment:
         logger.info('All done, experiment %d, trials %d',
                     self.id, len(self._trials))
 
+    def plot(self, fname):
+        plotter = Plotter(self, fname)
+        self._plot(plotter)
+
     ###############################################################
 
     @classmethod
@@ -196,6 +197,16 @@ class Experiment:
     def new(cls, *args, **kwargs):
         kwargs['experiment'] = DB().experiments.next_id()
         return cls(*args, **kwargs)
+
+    ###############################################################
+
+    @property
+    def thresholds(self):
+        history = self.control.swap.history
+        thresholds = history.score_export().thresholds
+        logger.info('Using thresholds %s', str(thresholds))
+
+        return thresholds
 
     @property
     def trials(self):

@@ -11,7 +11,7 @@ def plot(func):
     return wrapper
 
 
-class Plots:
+class Plotter:
     figures = 0
 
     def __init__(self, experiment, fname):
@@ -19,14 +19,13 @@ class Plots:
         self.plots = {0: []}
         self.figure = None
         # self.trials = list(Experiment.from_db(experiment).trials)
-        e = Experiment.from_db(experiment)
-        self.trials = list(e.trials)
-        print(len(e._trials), len(self.trials))
+        self.trials = list(experiment.trials)
+        print(len(experiment._trials), len(self.trials))
 
     @plot
     def plot_2d(self, ax, x_key, y_key, axes=None, title=None, s=10):
         if axes is None:
-            axes={}
+            axes = {}
 
         data = []
         for trial in self.trials:
@@ -45,7 +44,7 @@ class Plots:
     @plot
     def plot_3d(self, ax, x_key, y_key, c_key, axes=None, title=None, s=15):
         if axes is None:
-            axes={}
+            axes = {}
 
         data = []
         for trial in self.trials:
@@ -138,7 +137,8 @@ class Plots:
 
 
 def main():
-    p = Plots(1, 'output/plots-gamma-%d')
+    e = Experiment.from_db(1)
+    p = Plotter(e, 'output/plots-gamma-%d')
 
     # pylint: disable=E1120
     p.plot_2d('info.gamma', 'score_stats.purity')
