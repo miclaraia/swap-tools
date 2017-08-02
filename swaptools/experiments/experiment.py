@@ -288,6 +288,7 @@ class Interace(ui.Interface):
         args = args.__dict__
         for r in required:
             if not args[r]:
+                print(r)
                 raise Exception
 
     def call(self, args):
@@ -296,7 +297,7 @@ class Interace(ui.Interface):
         """
         experiment = None
         if args.run:
-            r = ['name', 'desc'] + self.required()
+            r = ['name', 'description'] + self.required()
             self._required(r, args)
 
             name = args.name[0]
