@@ -18,17 +18,14 @@ class Experiments(Collection):
         return {
             'experiment': {'type': int},
             'name': {'type': str},
-            'description': {'type': str}
+            'description': {'type': str},
+            'trials': {'type': int},
         }
 
     def _init_collection(self):
         pass
 
     #######################################################################
-
-    def add(self, experiment):
-        data = experiment.dict()
-        self.insert(data)
 
     def get(self, experiment_id):
         cursor = self.collection.find({'experiment': experiment_id})
