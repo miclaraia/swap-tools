@@ -158,6 +158,10 @@ class Plotter:
         self.plot_3d('thresholds.0', 'thresholds.1', 'score_stats.completeness',
                      {'x': 'Bogus Threshold',
                       'y': 'Real Threshold'})
+        self.plot_3d(
+            'thresholds.0', 'thresholds.1', standard,
+            {'x': 'Bogus Threshold',
+            'y': 'Real Threshold'})
 
         self.next()
         self.plot_3d('score_stats.fnr', 'score_stats.fpr', standard)

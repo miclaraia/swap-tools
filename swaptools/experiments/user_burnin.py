@@ -50,7 +50,9 @@ class UserBurnin(Experiment):
         p.plot_2d('info.gamma', 'score_stats.retired')
         p.plot_2d('info.gamma', 'score_stats.retired_correct',
                   {'y': 'Retired Correct'})
-        p.plot_2d('info.gamma', 'score_stats.tpr', {'y': 'TPR'})
+        p.plot_2d(
+            'info.gamma', 'score_stats.ncl_mean',
+            {'y': 'NCL'})
         p.plot_3d('thresholds.0', 'thresholds.1', 'info.gamma',
                   {'x': 'Bogus Threshold',
                    'y': 'Real Threshold'})
@@ -70,6 +72,10 @@ class UserBurnin(Experiment):
         p.plot_3d('thresholds.0', 'thresholds.1', 'score_stats.retired_correct',
                   {'x': 'Bogus Threshold',
                    'y': 'Real Threshold'})
+        p.plot_3d('thresholds.0', 'thresholds.1', 'info.gamma',
+                  {'x': 'Bogus Threshold',
+                   'y': 'Real Threshold'})
+        p.next()
 
         p.plot_standard('info.gamma')
 

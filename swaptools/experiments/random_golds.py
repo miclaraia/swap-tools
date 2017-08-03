@@ -101,16 +101,19 @@ class RandomGolds(Experiment):
                   {'x': 'Controversial', 'y': 'Consensus', 'c': 'NCL'})
 
         p.next()
+        p.plot_3d('score_stats.ncl_mean', 'score_stats.purity', 'golds',
+                  {'x': 'NCL'})
+        p.plot_3d('score_stats.ncl_mean', 'score_stats.completeness', 'golds',
+                  {'x': 'NCL'})
         p.plot_3d('score_stats.ncl_mean', 'score_stats.retired_correct',
                   'golds',
                   {'x': 'NCL',
                    'y': 'Retired Correct'})
         p.plot_3d('score_stats.ncl_mean', 'score_stats.retired', 'golds',
                   {'x': 'NCL'})
-        p.plot_3d('score_stats.ncl_mean', 'score_stats.purity', 'golds',
-                  {'x': 'NCL'})
-        p.plot_3d('score_stats.ncl_mean', 'score_stats.completeness', 'golds',
-                  {'x': 'NCL'})
+        p.plot_3d(
+            'golds', 'score_stats.ncl_mean',
+            {'y': 'NCL'})
         p.run()
 
 
