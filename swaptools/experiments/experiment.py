@@ -60,6 +60,10 @@ class Trial:
             ('gold_stats', self.gold_stats)
         ])
 
+    def upload(self):
+        logger.debug('Uploading trial')
+        DB().trials.insert(self.dict())
+
     @classmethod
     def interact_from_db(cls, trial_id):
         golds = DB().trials.get(trial_id)['golds']
@@ -94,6 +98,8 @@ class Experiment:
         self.trial_info = OrderedDict([('n', None)])
         self.trial_id = None
 
+        self._count = None
+
         self.control = None
         self.gg = GoldGetter()
 
@@ -104,6 +110,12 @@ class Experiment:
         logger.info('Setting up')
         config.back_update = False
         self.control = self._init_control()
+
+        count = self.count(new=True)
+        logger.info('Expecting to run %d trials', count)
+
+        # Save experiment data to database
+        self.upload()
 
     def setup_next(self):
         logger.info('Setting up next trial')
@@ -177,8 +189,8 @@ class Experiment:
             self.setup_next()
             self._run()
             self.post()
-        logger.info('Done running trials')
-        self.upload()
+
+        self.clean_db()
         logger.info('All done, experiment %d, trials %d',
                     self.id, len(self._trials))
 
@@ -206,11 +218,6 @@ class Experiment:
         return experiment
 
     @classmethod
-    def generate(cls, name, description):
-        experiment = DB().experiments.next_id()
-        return cls(experiment, name, description)
-
-    @classmethod
     def new(cls, *args, **kwargs):
         kwargs['experiment'] = DB().experiments.next_id()
         return cls(*args, **kwargs)
@@ -230,26 +237,32 @@ class Experiment:
         for trial in self._trials.values():
             yield trial
 
-    def count(self):
-        info = self.trial_info.copy()
-        n = 0
-        self.setup_first(info)
-        while self.has_next(info):
-            n += 1
-            self.setup_increment(info)
+    def count(self, new=False):
+        if new or self._count is None:
+            info = self.trial_info.copy()
+            self.setup_first(info)
 
-        return n
+            n = 0
+            while self.has_next(info):
+                n += 1
+                self.setup_increment(info)
+
+            self._count = n
+
+        return self._count
 
     def dict(self):
-        return {
-            'experiment': self.id,
-            'name': self.name,
-            'description': self.description
-        }
+        return OrderedDict([
+            ('experiment', self.id),
+            ('name', self.name),
+            ('description', self.description),
+            ('trials', self.count())
+        ])
 
     def add_trial(self, trial):
         logger.info('adding trial %s', trial)
         self._trials[trial.id] = trial
+        trial.upload()
 
     def fetch_trials(self):
         data = DB().trials.get_trials(self.id)
@@ -263,14 +276,12 @@ class Experiment:
         return trials
 
     def upload(self):
-        logger.info('Uploading trials')
+        logger.info('Uploading experiment')
         DB().experiments.insert(self.dict())
+        DB().trials.reserve(self.id, self.count())
 
-        trials = []
-        for trial in self.trials:
-            trials.append(trial.dict())
-        print(trials)
-        DB().trials.insert_many(trials)
+    def clean_db(self):
+        DB().trials.reserve_clear(self.id)
 
 
 class Interace(ui.Interface):

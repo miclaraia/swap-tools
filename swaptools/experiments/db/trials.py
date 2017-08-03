@@ -52,6 +52,19 @@ class Trials(Collection):
         if cursor.count() > 0:
             return cursor.next()
 
+    def reserve(self, experiment, n):
+        i = self.next_id()
+        self.collection.insert({
+            'experiment': experiment,
+            'trial': i + n - 1,
+            'reserve': True})
+
+    def reserve_clear(self, experiment):
+        self.collection.remove({
+            'experiment': experiment,
+            'reserve': True
+        })
+
     def get_trials(self, experiment_id):
         logger.info('getting trials for experiment %d', experiment_id)
         cursor = self.collection.find({'experiment': experiment_id})
