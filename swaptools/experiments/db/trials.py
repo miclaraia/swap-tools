@@ -54,10 +54,13 @@ class Trials(Collection):
 
     def reserve(self, experiment, n):
         i = self.next_id()
-        self.collection.insert({
-            'experiment': experiment,
-            'trial': i + n - 1,
-            'reserve': True})
+        self.collection.insert(OrderedDict([
+            ('experiment', experiment),
+            ('trial', i + n - 1),
+            ('reserve', True)
+        ]))
+
+        return i
 
     def reserve_clear(self, experiment):
         self.collection.remove({
