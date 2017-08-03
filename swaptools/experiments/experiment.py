@@ -161,6 +161,9 @@ class Experiment:
 
     def _has_next(self):
         info = self.trial_info.copy()
+        if info['n'] is None:
+            return True
+
         self.setup_increment(info)
 
         return self.has_next(info)
