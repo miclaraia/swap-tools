@@ -105,16 +105,23 @@ class Experiment:
         config.back_update = False
         self.control = self._init_control()
 
-    @staticmethod
-    def has_next():
-        return False
-
     def setup_next(self):
         logger.info('Setting up next trial')
-        if self.trial_info['n'] is None:
-            self.trial_info['n'] = 0
+
+        info = self.trial_info
+        if info['n'] is None:
+            self.setup_first(info)
         else:
-            self.trial_info['n'] += 1
+            self.setup_increment(info)
+
+    def has_next(self, info):
+        pass
+
+    def setup_first(self, info):
+        info['n'] = 0
+
+    def setup_increment(self, info):
+        info['n'] += 1
 
     def _plot(self, p):
         pass
@@ -140,6 +147,12 @@ class Experiment:
 
         control.run()
 
+    def _has_next(self):
+        info = self.trial_info.copy()
+        self.setup_increment(info)
+
+        return self.has_next(info)
+
     def post(self):
         logger.info('Done running trial')
         thresholds = self.thresholds
@@ -160,7 +173,7 @@ class Experiment:
 
     def run(self):
         self.setup()
-        while self.has_next():
+        while self._has_next():
             self.setup_next()
             self._run()
             self.post()
