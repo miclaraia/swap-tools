@@ -126,6 +126,8 @@ class Experiment:
         else:
             self.setup_increment(info)
 
+        logger.info('Trial: %s', str(info))
+
     def has_next(self, info):
         pass
 
@@ -173,16 +175,13 @@ class Experiment:
         thresholds = self.thresholds
         scores = self.control.swap.score_export(thresholds)
 
-        if self.trial_id is None:
-            self.trial_id = DB().trials.next_id()
-        else:
-            self.trial_id += 1
-
         trial = Trial.generate(
             experiment=self.id, trial=self.trial_id,
             info=self.trial_info.copy(),
             golds=self.gg.golds, score_export=scores)
+
         self.add_trial(trial)
+        self.trial_id += 1
 
         return trial
 
@@ -281,7 +280,9 @@ class Experiment:
     def upload(self):
         logger.info('Uploading experiment')
         DB().experiments.insert(self.dict())
-        DB().trials.reserve(self.id, self.count())
+        trial_id = DB().trials.reserve(self.id, self.count())
+
+        self.trial_id = trial_id
 
     def clean_db(self):
         DB().trials.reserve_clear(self.id)
