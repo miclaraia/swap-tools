@@ -230,6 +230,16 @@ class Experiment:
         for trial in self._trials.values():
             yield trial
 
+    def count(self):
+        info = self.trial_info.copy()
+        n = 0
+        self.setup_first(info)
+        while self.has_next(info):
+            n += 1
+            self.setup_increment(info)
+
+        return n
+
     def dict(self):
         return {
             'experiment': self.id,
