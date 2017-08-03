@@ -4,84 +4,47 @@ from swap.control import Control
 from swaptools.experiments.experiment import Trial
 from swaptools.experiments.experiment import Experiment
 from swaptools.experiments.random_golds import RandomGolds
+from swaptools.experiments.db import DB
+import swaptools.experiments.db.experiment as edb
+import swaptools.experiments.db.trials as tdb
 import swaptools.experiments.config as config
 
 from unittest.mock import MagicMock, patch
+import pytest
 
 
-class TestTrial:
+@pytest.fixture(scope='module')
+def override():
+    config.experiments.name = 'testexperiments'
+    DB._reset()
 
-    pass
+    patch.object(tdb.Trials, 'next_id', 0)
+    patch.object(edb.Experiments, 'next_id', 0)
 
 
+# pylint: disable=W0613,W0621,R0201
 class TestExperiment:
 
     @patch('swap.config.back_update', True)
-    def test_setup(self):
+    @patch.object(
+        edb.Experiments, 'insert',
+        MagicMock())
+    def test_setup(self, override):
         e = Experiment(None, None, None)
         e.setup()
 
         assert config.back_update is False
         assert isinstance(e.control, Control)
 
-    def test_setupnext_first(self):
+    def test_setupnext_first(self, override):
         e = Experiment(None, None, None)
         e.setup_next()
 
         assert e.trial_info['n'] == 0
 
-    def test_setupnext(self):
+    def test_setupnext(self, override):
         e = Experiment(None, None, None)
         e.trial_info['n'] = 1
         e.setup_next()
 
         assert e.trial_info['n'] == 2
-
-
-class TestRandomex:
-
-    def test_setupnext_middle(self):
-        e = RandomGolds(None, None, None, (1, 5, 1), 4)
-        e.trial_info = {'n': 2, 'golds': 2}
-
-        e.setup_next()
-        assert e.trial_info['n'] == 3
-        assert e.trial_info['golds'] == 2
-
-    def test_setupnext_rollover(self):
-        e = RandomGolds(None, None, None, (1, 5, 1), 4)
-        e.trial_info = {'n': 3, 'golds': 2}
-
-        e.setup_next()
-        assert e.trial_info['n'] == 0
-        assert e.trial_info['golds'] == 3
-
-    def test_hasnext_true(self):
-        e = RandomGolds(None, None, None, (1, 5, 1), 4)
-        e.trial_info = {'n': 3, 'golds': 2}
-
-        assert e.has_next() is True
-
-    def test_hasnext_false(self):
-        e = RandomGolds(None, None, None, (1, 5, 1), 4)
-        e.trial_info = {'n': 3, 'golds': 5}
-
-        assert e.has_next() is False
-
-    def test_hasnext_false_2(self):
-        e = RandomGolds(None, None, None, (1, 5, 1), 4)
-        e.trial_info = {'n': 4, 'golds': 5}
-
-        assert e.has_next() is False
-
-    def test_hasnext_border_true(self):
-        e = RandomGolds(None, None, None, (1, 5, 1), 4)
-        e.trial_info = {'n': 2, 'golds': 5}
-
-        assert e.has_next() is True
-
-    def test_hasnext_border_true_2(self):
-        e = RandomGolds(None, None, None, (1, 5, 1), 4)
-        e.trial_info = {'n': 3, 'golds': 4}
-
-        assert e.has_next() is True
