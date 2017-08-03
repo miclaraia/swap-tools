@@ -24,29 +24,25 @@ class RandomGolds(Experiment):
     def info_key_order():
         return ['n', 'golds']
 
-    def has_next(self):
-        n = self.trial_info['n']
-        if n is None:
-            return True
-        n += 1
+    def has_next(self, info):
+        n = info['n'] >= self.num_trials
+        golds = info['golds'] > self.num_golds[1]
 
-        golds = self.trial_info['golds']
-        golds += self.num_golds[2]
+        return not (n or golds)
 
-        if n >= self.num_trials and golds > self.num_golds[1]:
-            return False
-        return True
+    def setup_first(self, info):
+        super().setup_first(info)
+        info['golds'] = self.num_golds[0]
 
-    def setup(self):
-        super().setup()
-        self.trial_info['golds'] = self.num_golds[0]
+    def setup_increment(self, info):
+        super().setup_increment(info)
+        if info['n'] >= self.num_trials:
+            info['n'] = 0
+            info['golds'] += self.num_golds[2]
 
     def setup_next(self):
         super().setup_next()
         info = self.trial_info
-        if info['n'] >= self.num_trials:
-            self.trial_info['n'] = 0
-            info['golds'] += self.num_golds[2]
 
         logger.info('%s %s', str(info), str(self.num_trials))
         self.gg.reset()

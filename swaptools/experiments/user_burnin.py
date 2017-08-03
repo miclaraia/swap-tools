@@ -27,21 +27,25 @@ class UserBurnin(Experiment):
     def info_key_order():
         return ['n', 'gamma']
 
-    def has_next(self):
-        gamma = self.trial_info['gamma']
-        return gamma + self.gamma[2] <= self.gamma[1]
+    def has_next(self, info):
+        return info['gamma'] <= self.gamma[1]
 
     def setup(self):
         super().setup()
-        self.trial_info['gamma'] = self.gamma[0] - self.gamma[2]
         self.gg.random(self.num_golds)
+
+    def setup_first(self, info):
+        super().setup_first(info)
+        info['gamma'] = self.gamma[0]
+
+    def setup_increment(self, info):
+        super().setup_increment(info)
+        info['gamma'] += self.gamma[2]
 
     def setup_next(self):
         super().setup_next()
         info = self.trial_info
-        info['gamma'] += self.gamma[2]
 
-        logger.info('Gamma %d', info['gamma'])
         config.gamma = info['gamma']
 
     def _plot(self, p):

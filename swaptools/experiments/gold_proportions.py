@@ -28,29 +28,16 @@ class GoldProportions(Experiment):
     def info_key_order():
         return ['n', 'real', 'bogus']
 
-    def has_next(self):
-        n = self.trial_info['n']
-        if n is None:
-            return True
+    def has_next(self, info):
+        return info['bogus'] <= self.num_bogus[1]
 
-        n = n + 1 <= self.num_trials - 1
+    def setup_first(self, info):
+        super().setup_first(info)
+        info['real'] = self.num_real[0]
+        info['bogus'] = self.num_bogus[0]
 
-        real = self.trial_info['real'] + self.num_real[2]
-        real = real <= self.num_real[1]
-
-        bogus = self.trial_info['bogus'] + self.num_bogus[2]
-        bogus = bogus <= self.num_bogus[1]
-
-        return n or real or bogus
-
-    def setup(self):
-        super().setup()
-        self.trial_info['real'] = self.num_real[0]
-        self.trial_info['bogus'] = self.num_bogus[0]
-
-    def setup_next(self):
-        super().setup_next()
-        info = self.trial_info
+    def setup_increment(self, info):
+        super().setup_increment(info)
         if info['n'] >= self.num_trials:
             info['n'] = 0
             info['real'] += self.num_real[2]
@@ -59,7 +46,10 @@ class GoldProportions(Experiment):
                 info['real'] = self.num_real[0]
                 info['bogus'] += self.num_bogus[2]
 
-        logger.info('%s %s', str(info), str(self.num_trials))
+    def setup_next(self):
+        super().setup_next()
+        info = self.trial_info
+
         self.gg.reset()
         self.gg.random(info['real'], 1)
         self.gg.random(info['bogus'], 0)

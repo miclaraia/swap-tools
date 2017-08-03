@@ -23,20 +23,11 @@ class Controversial(Experiment):
     def info_key_order():
         return ['n', 'golds', 'cv', 'cn']
 
-    def has_next(self):
-        info = self.trial_info
-        cv = info['cv'] + self.num_cv[2] <= self.num_cv[1]
-        cn = info['cn'] + self.num_cn[2] <= self.num_cn[1]
-
-        return cv or cn
+    def has_next(self, info):
+        return info['cn'] <= self.num_cn[1]
 
     def setup(self):
         super().setup()
-        info = self.trial_info
-        info.update({
-            'cv': self.num_cv[0] - self.num_cv[2],
-            'cn': self.num_cn[0]
-        })
 
         gg = self.gg
         self._golds = {
@@ -45,14 +36,22 @@ class Controversial(Experiment):
             'cn': list(gg.consensus(self.num_cn[1])())
         }
 
-    def setup_next(self):
-        super().setup_next()
-        info = self.trial_info
+    def setup_first(self, info):
+        super().setup_first(info)
+        info['cv'] = self.num_cv[0]
+        info['cn'] = self.num_cn[0]
+
+    def setup_increment(self, info):
+        super().setup_increment(info)
 
         info['cv'] += self.num_cv[2]
         if info['cv'] > self.num_cv[1]:
             info['cv'] = self.num_cv[0]
             info['cn'] += self.num_cn[2]
+
+    def setup_next(self):
+        super().setup_next()
+        info = self.trial_info
 
         gg = self.gg
         gg.reset()
@@ -61,8 +60,6 @@ class Controversial(Experiment):
         gg.subjects(self._golds['cn'][:info['cn']])
 
         info['golds'] = len(gg.golds)
-        logger.info('trial: %s', str(info))
-
         logger.info('using %d golds', len(gg.golds))
 
 
