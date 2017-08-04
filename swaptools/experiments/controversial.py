@@ -9,8 +9,15 @@ logger = logging.getLogger(__name__)
 class Controversial(Experiment):
 
     def __init__(self, experiment, name, description,
-                 num_golds, controversial, consensus):
+                 num_golds=None, controversial=None, consensus=None):
         super().__init__(experiment, name, description)
+
+        if num_golds is None:
+            num_golds = 5
+        if controversial is None:
+            controversial = (100, 200, 100)
+        if consensus is None:
+            consensus = (100, 200, 100)
 
         self.num_golds = num_golds
         self.num_cv = controversial
@@ -61,6 +68,118 @@ class Controversial(Experiment):
 
         info['golds'] = len(gg.golds)
         logger.info('using %d golds', len(gg.golds))
+
+    def _plot(self, p):
+        p.plot_2d('golds', 'score_stats.purity')
+        p.plot_2d('golds', 'score_stats.completeness')
+        p.plot_2d('golds', 'score_stats.retired')
+        p.plot_2d(
+            'golds', 'score_stats.retired_correct',
+            {'y': 'Retired Correct'})
+        p.plot_2d('golds', 'score_stats.tpr', {'y': 'TPR'})
+        p.plot_3d(
+            'thresholds.0', 'thresholds.1', 'golds',
+            {'x': 'Bogus Threshold',
+             'y': 'Real Threshold'})
+
+        p.next()
+        p.plot_2d('info.cv', 'score_stats.purity')
+        p.plot_2d('info.cv', 'score_stats.completeness')
+        p.plot_2d('info.cv', 'score_stats.retired')
+        p.plot_2d(
+            'info.cv', 'score_stats.retired_correct',
+            {'y': 'Retired Correct'})
+        p.plot_2d('info.cv', 'score_stats.tpr', {'y': 'TPR'})
+        p.plot_3d(
+            'thresholds.0', 'thresholds.1', 'info.cv',
+            {'x': 'Bogus Threshold',
+             'y': 'Real Threshold'})
+
+        p.next()
+        p.plot_2d('info.cn', 'score_stats.purity')
+        p.plot_2d('info.cn', 'score_stats.completeness')
+        p.plot_2d('info.cn', 'score_stats.retired')
+        p.plot_2d(
+            'info.cn', 'score_stats.retired_correct',
+            {'y': 'Retired Correct'})
+        p.plot_2d('info.cn', 'score_stats.tpr', {'y': 'TPR'})
+        p.plot_3d(
+            'thresholds.0', 'thresholds.1', 'info.cn',
+            {'x': 'Bogus Threshold',
+             'y': 'Real Threshold'})
+
+        p.next()
+        p.plot_3d(
+            'score_stats.purity', 'score_stats.completeness',
+            'golds')
+        p.plot_3d(
+            'score_stats.purity', 'score_stats.completeness',
+            'info.cv')
+        p.plot_3d(
+            'score_stats.purity', 'score_stats.completeness',
+            'info.cn')
+        p.plot_3d('score_stats.purity', 'score_stats.completeness',
+                  'score_stats.retired')
+        p.plot_3d(
+            'score_stats.retired', 'score_stats.retired_correct',
+            'info.cv')
+        p.plot_3d(
+            'score_stats.retired', 'score_stats.retired_correct',
+            'info.cn')
+
+        p.next()
+        p.plot_2d('score_stats.fnr', 'score_stats.fpr')
+
+
+        p.next()
+        p.plot_3d('gold_stats.true', 'gold_stats.false', 'score_stats.purity')
+        p.plot_3d('gold_stats.fraction', 'score_stats.purity', 'info.cv')
+        p.plot_3d('gold_stats.fraction', 'score_stats.completeness', 'info.cv')
+        p.plot_3d('gold_stats.fraction', 'score_stats.retired', 'info.cv')
+
+        p.next()
+        p.plot_3d('gold_stats.true', 'gold_stats.false', 'score_stats.purity')
+        p.plot_3d('gold_stats.fraction', 'score_stats.purity', 'info.cn')
+        p.plot_3d('gold_stats.fraction', 'score_stats.completeness', 'info.cn')
+        p.plot_3d('gold_stats.fraction', 'score_stats.retired', 'info.cn')
+
+        p.plot_standard('golds')
+
+        p.next()
+        s = 40
+        p.plot_3d(
+            'info.cv', 'info.cn',
+            'score_stats.purity',
+            {'x': 'Controversial', 'y': 'Consensus'}, s=s)
+        p.plot_3d(
+            'info.cv', 'info.cn',
+            'score_stats.completeness',
+            {'x': 'Controversial', 'y': 'Consensus'}, s=s)
+        p.plot_3d(
+            'info.cv', 'info.cn',
+            'score_stats.retired',
+            {'x': 'Controversial', 'y': 'Consensus'}, s=s)
+        p.plot_3d(
+            'info.cv', 'info.cn',
+            'score_stats.retired_correct',
+            {'x': 'Controversial', 'y': 'Consensus', 'z': 'Retired Correct'},
+            s=s)
+
+        p.next()
+        p.plot_3d('score_stats.ncl_mean', 'score_stats.purity', 'golds',
+                  {'x': 'NCL'})
+        p.plot_3d('score_stats.ncl_mean', 'score_stats.completeness', 'golds',
+                  {'x': 'NCL'})
+        p.plot_3d('score_stats.ncl_mean', 'score_stats.retired_correct',
+                  'golds',
+                  {'x': 'NCL',
+                   'y': 'Retired Correct'})
+        p.plot_3d('score_stats.ncl_mean', 'score_stats.retired', 'golds',
+                  {'x': 'NCL'})
+        p.plot_2d(
+            'golds', 'score_stats.ncl_mean',
+            {'y': 'NCL'})
+        p.run()
 
 
 class Interface(_Interface):
