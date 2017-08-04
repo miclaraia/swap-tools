@@ -116,6 +116,7 @@ class Plotter:
         seaborn.reset_orig()
 
         for i, plots in self.plots.items():
+            print('Plot %d' % i)
             width = math.ceil(math.sqrt(len(plots)))
             height = math.ceil(len(plots) / width)
 
