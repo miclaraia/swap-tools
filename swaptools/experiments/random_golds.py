@@ -107,7 +107,7 @@ class RandomGolds(Experiment):
                    'y': 'Retired Correct'})
         p.plot_3d('score_stats.ncl_mean', 'score_stats.retired', 'golds',
                   {'x': 'NCL'})
-        p.plot_3d(
+        p.plot_2d(
             'golds', 'score_stats.ncl_mean',
             {'y': 'NCL'})
         p.run()
