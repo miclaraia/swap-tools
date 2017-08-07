@@ -98,7 +98,7 @@ class Interface(_Interface):
 
     @staticmethod
     def required():
-        return ['num_golds', 'prior', 'trials']
+        return ['num_golds', 'prior', 'num_trials']
 
     @staticmethod
     def run(name, description, args):
@@ -115,7 +115,7 @@ class Interface(_Interface):
             kwargs['prior'] = tuple(prior)
 
         if args.num_trials:
-            kwargs['trials'] = int(args.num_trials[0])
+            kwargs['num_trials'] = int(args.num_trials[0])
 
         e = Prior.new(**kwargs)
         e.run()
