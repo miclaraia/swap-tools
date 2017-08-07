@@ -127,6 +127,7 @@ class Plotter:
 
             self.figure = fig
             for j, func in enumerate(plots):
+                print(func)
                 ax = fig.add_subplot(height, width, j + 1)
                 func(ax)
 
