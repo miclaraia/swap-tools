@@ -1,0 +1,17 @@
+#!/bin/bash
+set -eu
+set -o pipefail
+
+NAME=experiment_data_$(date +"%Y%m%d%H%M%S").tar.gz
+DIR=/data/lucifer1.2/users/larai002/dumps
+
+ssh zoo -T zsh << EOF
+cd $DIR
+# mongodump --db experiments --archive=$NAME
+echo $NAME
+echo $DIR
+mongodump --db experiments --archive=$NAME
+EOF
+
+cd $SWAPD
+scp zoo:$DIR/$NAME .
