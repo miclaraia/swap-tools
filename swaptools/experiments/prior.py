@@ -63,7 +63,7 @@ class Prior(Experiment):
             gg.reset()
             gg.random(info['golds'])
 
-        config.prior = info['prior']
+        config.p0 = info['prior']
 
 
 class Interface(_Interface):
