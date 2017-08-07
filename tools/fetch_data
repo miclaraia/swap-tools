@@ -2,16 +2,36 @@
 set -eu
 set -o pipefail
 
-NAME=experiment_data_$(date +"%Y%m%d%H%M%S").tar.gz
-DIR=/data/lucifer1.2/users/larai002/dumps
+fetch () {
+    NAME=experiment_data_$(date +"%Y%m%d%H%M%S").tar.gz
+    DIR=/data/lucifer1.2/users/larai002/dumps
 
-ssh zoo -T zsh << EOF
-cd $DIR
-# mongodump --db experiments --archive=$NAME
-echo $NAME
-echo $DIR
-mongodump --db experiments --archive=$NAME
+    ssh zoo -T zsh << EOF
+    cd $DIR
+    # mongodump --db experiments --archive=$NAME
+    echo $NAME
+    echo $DIR
+    mongodump --db experiments --archive=$NAME
 EOF
 
-cd $SWAPD
-scp zoo:$DIR/$NAME .
+    cd $SWAPD
+    scp zoo:$DIR/$NAME .
+}
+
+rotate () {
+    file="$2"
+    echo $file
+    if [[ ! -z "${file// }" ]]; then
+        mongo experiments --eval " db.dropDatabase()"
+        mongorestore --db experiments --archive=$file
+    fi
+}
+
+case $1 in
+    "fetch")
+        fetch
+        ;;
+    "rotate")
+        rotate "$@"
+        ;;
+esac
