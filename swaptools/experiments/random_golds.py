@@ -140,6 +140,10 @@ class Interface(_Interface):
             '--num-trials', nargs=1)
 
     @staticmethod
+    def required():
+        return ['num_golds', 'num_trials']
+
+    @staticmethod
     def run(name, description, args):
         kwargs = {
             'name': name,
