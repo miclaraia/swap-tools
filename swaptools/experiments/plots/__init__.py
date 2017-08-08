@@ -19,12 +19,13 @@ class Plotter:
         self.fname = fname
         self.plots = {0: []}
         self.figure = None
+        self._kwargs = {}
         # self.trials = list(Experiment.from_db(experiment).trials)
         self.trials = list(experiment.trials)
         print(len(experiment._trials), len(self.trials))
 
     @plot
-    def plot_2d(self, ax, x_key, y_key, axes=None, title=None, s=10):
+    def plot_2d(self, ax, x_key, y_key, axes=None, title=None, **kwargs):
         if axes is None:
             axes = {}
 
@@ -35,7 +36,7 @@ class Plotter:
             data.append((x, y))
 
         x, y = zip(*data)
-        ax.scatter(x, y, s=s)
+        ax.scatter(x, y, **kwargs)
 
         axes = self.axes(x_key, y_key, None, axes)
         if title is None:
@@ -43,7 +44,9 @@ class Plotter:
         self.pretty(ax, axes['x'], axes['y'], title)
 
     @plot
-    def plot_3d(self, ax, x_key, y_key, c_key, axes=None, title=None, s=15):
+    def plot_3d(
+            self, ax, x_key, y_key, c_key,
+            axes=None, title=None, **kwargs):
         if axes is None:
             axes = {}
 
@@ -55,7 +58,7 @@ class Plotter:
             data.append((x, y, c))
 
         x, y, c = zip(*data)
-        im = ax.scatter(x, y, c=c, s=s, cmap='viridis')
+        im = ax.scatter(x, y, c=c, cmap='viridis', **kwargs)
         self.figure.colorbar(im, ax=ax)
 
         axes = self.axes(x_key, y_key, c_key, axes)
@@ -98,16 +101,33 @@ class Plotter:
 
             return value
 
+    @property
+    def kwargs(self):
+        kwargs = {'s': 10, 'alpha': 1}
+        kwargs.update(self._kwargs)
+        return kwargs
+
+    @kwargs.setter
+    def kwargs(self, kwargs):
+        self._kwargs = kwargs.copy()
+
     def plot(self, func, *args, **kwargs):
+        _kwargs = self.kwargs
+        _kwargs.update(kwargs)
+
         def inner(ax):
-            func(self, ax, *args, **kwargs)
+            func(self, ax, *args, **_kwargs)
         self.plots[self.figures].append(inner)
 
     def reset(self):
         self.plots = []
         self.figure = None
 
-    def next(self):
+    def next(self, kwargs=None):
+        if kwargs is None:
+            self.kwargs = {}
+        else:
+            self.kwargs = kwargs.copy()
         self.figures += 1
         self.plots[self.figures] = []
 

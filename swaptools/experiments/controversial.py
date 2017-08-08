@@ -82,7 +82,7 @@ class Controversial(Experiment):
             {'x': 'Bogus Threshold',
              'y': 'Real Threshold'})
 
-        p.next()
+        p.next({'s': 15, 'alpha': .5})
         p.plot_3d('info.cv', 'score_stats.purity', 'info.cn')
         p.plot_3d('info.cv', 'score_stats.completeness', 'info.cn')
         p.plot_3d('info.cv', 'score_stats.retired', 'info.cn')
@@ -95,7 +95,7 @@ class Controversial(Experiment):
             {'x': 'Bogus Threshold',
              'y': 'Real Threshold'})
 
-        p.next()
+        p.next({'s': 15, 'alpha': .5})
         p.plot_3d('info.cn', 'score_stats.purity', 'info.cv')
         p.plot_3d('info.cn', 'score_stats.completeness', 'info.cv')
         p.plot_3d('info.cn', 'score_stats.retired', 'info.cv')
@@ -150,48 +150,61 @@ class Controversial(Experiment):
             'score_stats.retired', 'score_stats.retired_correct',
             'info.cn')
 
-        p.next()
-        p.plot_2d('score_stats.fnr', 'score_stats.fpr')
+        p.next({'s': 40})
         p.plot_3d(
-            'gold_stats.controversial.mean',
-            'gold_stats.controversial.mean',
             'info.cv',
-            {'x': 'Controversial', 'y': 'Consensus'})
-        p.plot_3d(
-            'gold_stats.controversial.mean',
-            'gold_stats.controversial.mean',
             'info.cn',
-            {'x': 'Controversial', 'y': 'Consensus'})
-
+            'gold_stats.controversial.mean',
+            {'c': 'Controversial Average'})
+        p.plot_3d(
+            'info.cv',
+            'info.cn',
+            'gold_stats.consensus.mean',
+            {'c': 'Consensus Average'})
+        p.kwargs = {}
+        p.plot_2d('score_stats.fnr', 'score_stats.fpr')
 
         p.next()
         p.plot_3d('gold_stats.true', 'gold_stats.false', 'score_stats.purity')
-        p.plot_3d('gold_stats.fraction', 'score_stats.purity', 'info.cv')
-        p.plot_3d('gold_stats.fraction', 'score_stats.completeness', 'info.cv')
-        p.plot_3d('gold_stats.fraction', 'score_stats.retired', 'info.cv')
+        p.plot_2d('gold_stats.fraction', 'score_stats.purity')
+        p.plot_2d('gold_stats.fraction', 'score_stats.completeness')
+        p.plot_2d('gold_stats.fraction', 'score_stats.retired')
+        p.plot_3d('info.cv', 'gold_stats.fraction', 'info.cn')
+        p.plot_3d('info.cn', 'gold_stats.fraction', 'info.cv')
 
         p.next()
-        p.plot_3d('gold_stats.true', 'gold_stats.false', 'score_stats.purity')
-        p.plot_3d('gold_stats.fraction', 'score_stats.purity', 'info.cn')
-        p.plot_3d('gold_stats.fraction', 'score_stats.completeness', 'info.cn')
-        p.plot_3d('gold_stats.fraction', 'score_stats.retired', 'info.cn')
+        p.plot_3d('info.cv', 'gold_stats.fraction', 'info.cn')
+        p.plot_3d('info.cv', 'gold_stats.fraction', 'score_stats.purity')
+        p.plot_3d('info.cv', 'gold_stats.fraction', 'score_stats.completeness')
+        p.plot_3d('info.cv', 'gold_stats.fraction', 'score_stats.retired')
+
+        p.next()
+        p.plot_3d('info.cn', 'gold_stats.fraction', 'info.cv')
+        p.plot_3d('info.cn', 'gold_stats.fraction', 'score_stats.purity')
+        p.plot_3d('info.cn', 'gold_stats.fraction', 'score_stats.completeness')
+        p.plot_3d('info.cn', 'gold_stats.fraction', 'score_stats.retired')
 
         p.plot_standard('golds')
 
         p.next()
-        p.plot_3d('score_stats.ncl_mean', 'score_stats.purity', 'golds',
-                  {'x': 'NCL'})
-        p.plot_3d('score_stats.ncl_mean', 'score_stats.completeness', 'golds',
-                  {'x': 'NCL'})
-        p.plot_3d('score_stats.ncl_mean', 'score_stats.retired_correct',
-                  'golds',
-                  {'x': 'NCL',
-                   'y': 'Retired Correct'})
-        p.plot_3d('score_stats.ncl_mean', 'score_stats.retired', 'golds',
-                  {'x': 'NCL'})
-        p.plot_2d(
-            'golds', 'score_stats.ncl_mean',
-            {'y': 'NCL'})
+        p.plot_3d(
+            'score_stats.ncl_mean', 'score_stats.purity', 'info.cv',
+            {'x': 'NCL'})
+        p.plot_3d(
+            'score_stats.ncl_mean', 'score_stats.purity', 'info.cn',
+            {'x': 'NCL'})
+        p.plot_3d(
+            'score_stats.ncl_mean', 'score_stats.completeness', 'info.cv',
+            {'x': 'NCL'})
+        p.plot_3d(
+            'score_stats.ncl_mean', 'score_stats.completeness', 'info.cn',
+            {'x': 'NCL'})
+        p.plot_3d(
+            'score_stats.ncl_mean', 'score_stats.retired', 'info.cv',
+            {'x': 'NCL'})
+        p.plot_3d(
+            'score_stats.ncl_mean', 'score_stats.retired', 'info.cn',
+            {'x': 'NCL'})
         p.run()
 
 
