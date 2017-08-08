@@ -155,6 +155,7 @@ class Experiment:
     def _run(self):
         logger.info('Running trial')
         logger.debug('Using %d golds', len(self.gg.golds))
+        logger.debug('gold labels: %s', str(list(self.gg.golds)))
         control = self.control
         control.reset()
         control.gold_getter.these(self.gg.golds)
