@@ -79,7 +79,6 @@ class UserBurnin(Experiment):
         p.plot_3d('thresholds.0', 'thresholds.1', 'info.gamma',
                   {'x': 'Bogus Threshold',
                    'y': 'Real Threshold'})
-        p.next()
 
         p.plot_standard('info.gamma')
 
