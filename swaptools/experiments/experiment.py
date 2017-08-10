@@ -272,8 +272,9 @@ class Experiment:
 
         trials = {}
         for trial in data:
-            trial = Trial.from_db(trial)
-            trials[trial.id] = trial
+            if 'score_stats' in trial and 'purity' in trial['score_stats']:
+                trial = Trial.from_db(trial)
+                trials[trial.id] = trial
 
         self._trials = trials
         return trials
@@ -306,6 +307,10 @@ class Interace(ui.Interface):
 
         parser.add_argument(
             '--shell', action='store_true')
+
+        parser.add_argument(
+            '--interact', nargs=1
+        )
 
         parser.add_argument(
             '--plot', nargs=2,
@@ -342,6 +347,10 @@ class Interace(ui.Interface):
             name = args.name[0]
             desc = args.description[0]
             experiment = self.run(name, desc, args)
+
+        if args.interact:
+            trial_id = int(args.interact[0])
+            Trial.interact_from_db(trial_id)
 
         if args.plot:
             experiment_id = int(args.plot[0])
