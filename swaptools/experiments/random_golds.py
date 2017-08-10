@@ -60,6 +60,12 @@ class RandomGolds(Experiment):
                    'y': 'Real Threshold'})
 
         p.next()
+        p.plot_3d('golds', 'score_stats.purity', 'score_stats.completeness')
+        p.plot_3d('golds', 'score_stats.purity', 'score_stats.retired')
+        p.plot_3d('golds', 'score_stats.purity', 'score_stats.retired_correct')
+        p.plot_3d('golds', 'score_stats.completeness', 'score_stats.purity')
+
+        p.next()
         p.plot_3d('gold_stats.controversial.mean', 'golds',
                   'score_stats.retired',
                   {'x': 'Controversial'})
@@ -107,8 +113,8 @@ class RandomGolds(Experiment):
                    'y': 'Retired Correct'})
         p.plot_3d('score_stats.ncl_mean', 'score_stats.retired', 'golds',
                   {'x': 'NCL'})
-        p.plot_2d(
-            'golds', 'score_stats.ncl_mean',
+        p.plot_3d(
+            'golds', 'score_stats.ncl_mean', 'score_stats.purity',
             {'y': 'NCL'})
         p.run()
 
