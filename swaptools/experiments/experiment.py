@@ -197,10 +197,13 @@ class Experiment:
         logger.info('All done, experiment %d, trials %d',
                     self.id, len(self._trials))
 
-    def plot(self, fname):
+    def add_fraction_stat(self):
         for trial in self.trials:
             g = trial.gold_stats
             g['fraction'] = g['true'] / g['total']
+
+    def plot(self, fname):
+        self.add_fraction_stat()
 
         plotter = Plotter(self, fname)
         self._plot(plotter)
