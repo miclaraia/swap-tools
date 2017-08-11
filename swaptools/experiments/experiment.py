@@ -71,7 +71,9 @@ class Trial:
         control.gold_getter.subjects(golds)
         control.run()
 
-        gs = GoldStats(golds)
+        gg = GoldGetter()
+        gg.subjects(golds)
+        gs = GoldStats(gg.golds)
 
         swap = control.getSWAP()
         scores = swap.score_export()
