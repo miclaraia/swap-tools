@@ -144,11 +144,13 @@ class Plotter:
                 fig = plt.figure(i)
             else:
                 fig = plt.figure(i, figsize=(16, 9))
+            plt.clf()
 
             self.figure = fig
             for j, func in enumerate(plots):
                 print(func)
                 ax = fig.add_subplot(height, width, j + 1)
+                plt.cla()
                 func(ax)
 
             plt.subplots_adjust(left=0.1, bottom=0.05, right=0.9, top=0.95,
@@ -183,7 +185,7 @@ class Plotter:
         self.plot_3d(
             'thresholds.0', 'thresholds.1', standard,
             {'x': 'Bogus Threshold',
-            'y': 'Real Threshold'})
+             'y': 'Real Threshold'})
 
         self.next()
         self.plot_3d('score_stats.fnr', 'score_stats.fpr', standard)
