@@ -78,6 +78,7 @@ class Trial:
         swap = control.getSWAP()
         scores = swap.score_export()
         assert scores
+        assert gs
         code.interact(local=locals())
 
     ###############################################################
