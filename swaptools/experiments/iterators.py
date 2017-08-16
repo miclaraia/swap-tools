@@ -100,7 +100,7 @@ class _List(_Iterator):
         return value
 
     def more(self):
-        return self.i < len(self.values)
+        return self.i + 1 < len(self.values)
 
     def reset(self):
         self.i = 0
