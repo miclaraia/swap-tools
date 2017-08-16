@@ -85,6 +85,10 @@ class _List(_Iterator):
     def current(self):
         return self.values[self.i]
 
+    @current.setter
+    def current(self, value):
+        pass
+
     def next(self):
         if self.more():
             return self.values[self.i + 1]
