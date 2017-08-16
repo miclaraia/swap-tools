@@ -45,8 +45,8 @@ cvcn () {
 goldprop () {
     swap_tools --config-file $CONFIG goldprop \
     --fraction 0 1 .05 \
-    --series 5
-    --golds 5000 10000 20000
+    --series 5 \
+    --golds 5000 10000 20000 \
     --name golds-3 \
     --description \
     "Fraction real golds with static total golds and varying proportion" \
