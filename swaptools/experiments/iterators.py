@@ -65,6 +65,8 @@ class _Range(_Iterator):
         return self.current + self._step
 
     def more(self):
+        if type(self.current) is float or type(self.end) is float:
+            return self.next() - self.end < 1e-9
         return self.next() <= self.end
 
     def reset(self):
