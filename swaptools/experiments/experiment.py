@@ -130,7 +130,11 @@ class Experiment:
         pass
 
     def has_next(self):
-        return self.values[-1].more()
+        for v in self.values:
+            print(v.name, v.current)
+            if v.more():
+                return True
+        return False
 
     def setup_first(self):
         pass
