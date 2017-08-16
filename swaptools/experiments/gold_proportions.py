@@ -1,4 +1,5 @@
 
+from swaptools.experiments.iterators import ValueIterator
 from swaptools.experiments.experiment import Experiment
 from swaptools.experiments.experiment import Interace as _Interface
 
@@ -155,17 +156,17 @@ class Interface(_Interface):
         super().options(parser)
 
         parser.add_argument(
-            '--num-real', nargs=3)
+            '--fraction', nargs=3)
 
         parser.add_argument(
-            '--num-bogus', nargs=3)
+            '--series', nargs=1)
 
         parser.add_argument(
-            '--num-trials', nargs=1)
+            '--golds', nargs='*')
 
     @staticmethod
     def required():
-        return ['num_real', 'num_bogus', 'num_trials']
+        return ['fraction', 'series', 'golds']
 
     @staticmethod
     def run(name, description, args):
@@ -173,16 +174,17 @@ class Interface(_Interface):
             'name': name,
             'description': description,
         }
-        if args.num_real:
-            real = [int(i) for i in args.num_real[0:3]]
-            kwargs['num_real'] = tuple(real)
+        if args.fraction:
+            a = [float(i) for i in args.fraction[:3]]
+            kwargs['fraction'] = ValueIterator.range(*a)
 
-        if args.num_bogus:
-            bogus = [int(i) for i in args.num_bogus[0:3]]
-            kwargs['num_bogus'] = tuple(bogus)
+        if args.series:
+            series = int(args.series[0])
+            kwargs['series'] = ValueIterator.range(1, series, 1)
 
-        if args.num_trials:
-            kwargs['num_trials'] = int(args.num_trials[0])
+        if args.golds:
+            a = [int(i) for i in args.golds]
+            kwargs['num_golds'] = ValueIterator.list(a)
 
         e = GoldProportions.new(**kwargs)
         e.run()
