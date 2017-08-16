@@ -144,6 +144,8 @@ class Experiment:
             if v.more():
                 v.step()
                 break
+            else:
+                v.reset()
 
     def _plot(self, p):
         pass
