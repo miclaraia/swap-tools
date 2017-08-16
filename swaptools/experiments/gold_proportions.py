@@ -1,8 +1,9 @@
 
-from swaptools.experiments.random_golds import RandomGolds
+from swaptools.experiments.iterators import ValueIterator
 from swaptools.experiments.experiment import Experiment
 from swaptools.experiments.experiment import Interace as _Interface
 
+import math
 import logging
 
 logger = logging.getLogger(__name__)
@@ -10,49 +11,28 @@ logger = logging.getLogger(__name__)
 class GoldProportions(Experiment):
 
     def __init__(self, experiment, name, description,
-                 num_real=None, num_bogus=None, num_trials=10):
+                 num_golds=None, fraction=None, series=None):
         super().__init__(experiment, name, description)
 
-        if num_real is None:
-            num_real = (1000, 2000, 1000)
-        if num_bogus is None:
-            num_bogus = (1000, 2000, 1000)
+        if num_golds and fraction and series:
+            series._name('series')
+            fraction._name('fraction')
+            num_golds._name('golds')
 
-        self.num_real = num_real
-        self.num_bogus = num_bogus
-        self.num_trials = num_trials
-
-        self.trial_info.update({'real': 0, 'bogus': 0})
-
-    @staticmethod
-    def info_key_order():
-        return ['n', 'real', 'bogus']
-
-    def has_next(self, info):
-        return info['bogus'] <= self.num_bogus[1]
-
-    def setup_first(self, info):
-        super().setup_first(info)
-        info['real'] = self.num_real[0]
-        info['bogus'] = self.num_bogus[0]
-
-    def setup_increment(self, info):
-        super().setup_increment(info)
-        if info['n'] >= self.num_trials:
-            info['n'] = 0
-            info['real'] += self.num_real[2]
-
-            if info['real'] > self.num_real[1]:
-                info['real'] = self.num_real[0]
-                info['bogus'] += self.num_bogus[2]
+        self.values = [series, fraction, num_golds]
 
     def setup_next(self):
-        super().setup_next()
         info = self.trial_info
 
+        g = info['golds']
+        f = info['fraction']
+
+        real = math.floor(g * f)
+        bogus = math.ceil(g * (1 - f))
+
         self.gg.reset()
-        self.gg.random(info['real'], 1)
-        self.gg.random(info['bogus'], 0)
+        self.gg.random(real, 1)
+        self.gg.random(bogus, 0)
 
     def _plot(self, p):
         p.plot_2d('golds', 'score_stats.purity')
@@ -176,17 +156,17 @@ class Interface(_Interface):
         super().options(parser)
 
         parser.add_argument(
-            '--num-real', nargs=3)
+            '--fraction', nargs=3)
 
         parser.add_argument(
-            '--num-bogus', nargs=3)
+            '--series', nargs=1)
 
         parser.add_argument(
-            '--num-trials', nargs=1)
+            '--golds', nargs='*')
 
     @staticmethod
     def required():
-        return ['num_real', 'num_bogus', 'num_trials']
+        return ['fraction', 'series', 'golds']
 
     @staticmethod
     def run(name, description, args):
@@ -194,16 +174,17 @@ class Interface(_Interface):
             'name': name,
             'description': description,
         }
-        if args.num_real:
-            real = [int(i) for i in args.num_real[0:3]]
-            kwargs['num_real'] = tuple(real)
+        if args.fraction:
+            a = [float(i) for i in args.fraction[:3]]
+            kwargs['fraction'] = ValueIterator.range(*a)
 
-        if args.num_bogus:
-            bogus = [int(i) for i in args.num_bogus[0:3]]
-            kwargs['num_bogus'] = tuple(bogus)
+        if args.series:
+            series = int(args.series[0])
+            kwargs['series'] = ValueIterator.range(1, series, 1)
 
-        if args.num_trials:
-            kwargs['num_trials'] = int(args.num_trials[0])
+        if args.golds:
+            a = [int(i) for i in args.golds]
+            kwargs['num_golds'] = ValueIterator.list(a)
 
         e = GoldProportions.new(**kwargs)
         e.run()

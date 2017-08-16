@@ -78,6 +78,7 @@ class Trial:
         swap = control.getSWAP()
         scores = swap.score_export()
         assert scores
+        assert gs
         code.interact(local=locals())
 
     ###############################################################
@@ -95,17 +96,21 @@ class Experiment:
 
     def __init__(self, experiment, name, description):
         self.id = experiment
-        self.name = name
-        self.description = description
+        self.info = {
+            'name': name,
+            'description': description,
+            'trial_id': None,
+            'count': None
+        }
 
         self._trials = {}
-        self.trial_info = OrderedDict([('n', None)])
-        self.trial_id = None
-
-        self._count = None
+        # self.trial_info = OrderedDict([('n', None)])
+        self.n = None
 
         self.control = None
         self.gg = GoldGetter()
+
+        self.values = []
 
     ###############################################################
     ## Override by Experiment subclasses
@@ -122,24 +127,25 @@ class Experiment:
         self.upload()
 
     def setup_next(self):
-        logger.info('Setting up next trial')
-
-        info = self.trial_info
-        if info['n'] is None:
-            self.setup_first(info)
-        else:
-            self.setup_increment(info)
-
-        logger.info('Trial: %s', str(info))
-
-    def has_next(self, info):
         pass
 
-    def setup_first(self, info):
-        info['n'] = 0
+    def has_next(self):
+        for v in self.values:
+            print(v.name, v.current)
+            if v.more():
+                return True
+        return False
 
-    def setup_increment(self, info):
-        info['n'] += 1
+    def setup_first(self):
+        pass
+
+    def setup_increment(self):
+        for v in self.values:
+            if v.more():
+                v.step()
+                break
+            else:
+                v.reset()
 
     def _plot(self, p):
         pass
@@ -147,11 +153,6 @@ class Experiment:
     @staticmethod
     def _init_control():
         return Control()
-
-    @staticmethod
-    def info_key_order():
-        # TODO not actually being used yet
-        return ['n', 'golds']
 
     ###############################################################
     ## Running the experiment
@@ -167,50 +168,60 @@ class Experiment:
         control.run()
 
     def _has_next(self):
-        info = self.trial_info.copy()
-        if info['n'] is None:
+        if self.n is None:
             return True
 
-        self.setup_increment(info)
+        return self.has_next()
 
-        return self.has_next(info)
+    def _setup_next(self):
+        logger.info('Setting up next trial')
 
-    def post(self):
+        if self.n is None:
+            self.n = 0
+            self.setup_first()
+        else:
+            self.n += 1
+            self.setup_increment()
+
+        logger.info('Trial: %s', str(self.trial_info))
+        self.setup_next()
+
+    def _post(self):
         logger.info('Done running trial')
         thresholds = self.thresholds
         scores = self.control.swap.score_export(thresholds)
 
         trial = Trial.generate(
-            experiment=self.id, trial=self.trial_id,
-            info=self.trial_info.copy(),
+            experiment=self.id, trial=self.info['trial_id'],
+            info=self.trial_info,
             golds=self.gg.golds, score_export=scores)
 
         self.add_trial(trial)
-        self.trial_id += 1
+        self.info['trial_id'] += 1
 
         return trial
 
     def run(self):
         self.setup()
         while self._has_next():
-            self.setup_next()
+            self._setup_next()
             self._run()
-            self.post()
+            self._post()
 
         self.clean_db()
         logger.info('All done, experiment %d, trials %d',
                     self.id, len(self._trials))
 
-    def add_fraction_stat(self):
-        for trial in self.trials:
-            g = trial.gold_stats
-            g['fraction'] = g['true'] / g['total']
-
     def plot(self, fname):
-        self.add_fraction_stat()
+        self._add_fraction_stat()
 
         plotter = Plotter(self, fname)
         self._plot(plotter)
+
+    def _add_fraction_stat(self):
+        for trial in self.trials:
+            g = trial.gold_stats
+            g['fraction'] = g['true'] / g['total']
 
     ###############################################################
 
@@ -224,7 +235,7 @@ class Experiment:
         }
 
         experiment = cls(**kwargs)
-        experiment.fetch_trials()
+        experiment._fetch_trials()
         return experiment
 
     @classmethod
@@ -247,25 +258,27 @@ class Experiment:
         for trial in self._trials.values():
             yield trial
 
+    @property
+    def trial_info(self):
+        values = [(v.name, v.current) for v in self.values]
+        return OrderedDict([('n', self.n)] + values)
+
     def count(self, new=False):
-        if new or self._count is None:
-            info = self.trial_info.copy()
-            self.setup_first(info)
+        if new or self.info['count'] is None:
+            c = 1
+            for v in self.values:
+                c *= v.count()
+            self.info['count'] = c
 
-            n = 0
-            while self.has_next(info):
-                n += 1
-                self.setup_increment(info)
-
-            self._count = n
-
-        return self._count
+        return self.info['count']
 
     def dict(self):
+        name = self.info['name']
+        desc = self.info['description']
         return OrderedDict([
             ('experiment', self.id),
-            ('name', self.name),
-            ('description', self.description),
+            ('name', name),
+            ('description', desc),
             ('trials', self.count())
         ])
 
@@ -274,7 +287,7 @@ class Experiment:
         self._trials[trial.id] = trial
         trial.upload()
 
-    def fetch_trials(self):
+    def _fetch_trials(self):
         data = DB().trials.get_trials(self.id)
 
         trials = {}
@@ -291,7 +304,7 @@ class Experiment:
         DB().experiments.insert(self.dict())
         trial_id = DB().trials.reserve(self.id, self.count())
 
-        self.trial_id = trial_id
+        self.info['trial_id'] = trial_id
 
     def clean_db(self):
         DB().trials.reserve_clear(self.id)
