@@ -168,7 +168,7 @@ class Experiment:
         control.run()
 
     def _has_next(self):
-        if self.info['n'] is None:
+        if self.n is None:
             return True
 
         return self.has_next()
