@@ -150,6 +150,14 @@ class Plotter:
             data.append(values)
 
         return data
+
+    @staticmethod
+    def filter_data(data, condition):
+        """
+        Filter points from all the data
+        """
+        return [d for d in data if condition(d)]
+
     @property
     def kwargs(self):
         kwargs = {'s': 10, 'alpha': 1, 'cmap': 'viridis'}
