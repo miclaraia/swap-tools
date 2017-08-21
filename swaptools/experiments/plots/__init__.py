@@ -4,7 +4,8 @@
 import math
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
-import seaborn
+import seaborn as sns
+import numpy as np
 
 
 def plot(func):
@@ -86,9 +87,53 @@ class Plotter:
         self.pretty(ax, axes, title)
 
         return ax
+
+    @plot
+    def plot_kde(
+            self, ax, x_key, y_key, c_key,
+            axes=None, title=None, pltargs=None, **kwargs):
+
+
+
+        keys = (x_key, y_key, c_key)
+        if pltargs is None:
+            pltargs = {}
+
+        data = self.get_data(keys)
+
+        if 'domain' in kwargs:
+            domain = kwargs['domain']
+        else:
+            domain = self.find_domain(data)
+
+        def cond(value):
+            def f(data_point):
+                c = data_point[2]
+                return c - value < 2
+            return f
+
+        print(domain)
+        colors = ['Blues', 'Reds', 'Greens', 'Purples']
+        cmap = DiscreteColorMap(colors)
+        for d in domain:
+            filtered = self.filter_data(data, cond(d))
+            x, y, _ = zip(*filtered)
+            x = np.array(x)
+            y = np.array(y)
+            sns.kdeplot(
+                x, y, cmap=cmap(d),
+                shade=True, shade_lowest=False,
+                alpha=.7)
+            print(d)
+
+        if axes is None:
+            axes = {}
+        axes = self.axes(keys, axes)
+        title = '%(x)s vs %(y)s kernel density' % axes
         self.pretty(ax, axes, title)
 
         return ax
+
     #############################################################
 
     @staticmethod
