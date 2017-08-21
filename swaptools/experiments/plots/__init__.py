@@ -3,6 +3,7 @@
 
 import math
 import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
 import seaborn
 
 
@@ -47,6 +48,8 @@ class Plotter:
             title = '%(x)s vs %(y)s' % axes
         self.pretty(ax, axes['x'], axes['y'], title)
 
+        return ax
+
     @plot
     def plot_3d(
             self, ax, x_key, y_key, c_key,
@@ -61,12 +64,32 @@ class Plotter:
             x = self.get_value(trial, x_key)
             y = self.get_value(trial, y_key)
             c = self.get_value(trial, c_key)
-            data.append((x, y, c))
 
+            data.append((x, y, c))
         x, y, c = zip(*data)
-        im = ax.scatter(x, y, c=c, cmap='viridis', **kwargs)
-        self.figure.colorbar(im, ax=ax)
+
+        cmap = None
+        if pltargs.get('cmap') == 'discrete':
+            pltargs['cmap'] = None
+            cmap = DiscreteColorMap()
+
+            if 'domain' in pltargs:
+                cmap.domain(pltargs['domain'])
+                pltargs.pop('domain')
+
+            c = list(c)
+            for i, v in enumerate(c):
+                c[i] = cmap(v)
+
+            patches = []
+            for value, color in cmap.cmap.items():
+                patch = mpatches.Patch(color=color, label=value)
+                patches.append(patch)
+            ax.legend(handles=patches)
+
         im = ax.scatter(x, y, c=c, **pltargs)
+        if cmap is None:
+            self.figure.colorbar(im, ax=ax)
 
         axes = self.axes(x_key, y_key, c_key, axes)
         if title is None:
@@ -111,7 +134,7 @@ class Plotter:
 
     @property
     def kwargs(self):
-        kwargs = {'s': 10, 'alpha': 1}
+        kwargs = {'s': 10, 'alpha': 1, 'cmap': 'viridis'}
         kwargs.update(self._kwargs)
         return kwargs
 
@@ -283,3 +306,30 @@ class Plotter:
 #
 # if __name__ == '__main__':
 #     main()
+
+class DiscreteColorMap:
+
+    colors = ["#9b59b6", "#3498db", "#707070", "#e74c3c", "#34495e", "#2ecc71"]
+
+    def __init__(self):
+        self.cmap = {}
+        self.i = 0
+
+    def __call__(self, value):
+        return self.color(value)
+
+    def color(self, value):
+        if value in self.cmap:
+            return self.cmap[value]
+        return self._map(value)
+
+    def _map(self, value):
+        color = self.colors[self.i]
+        self.i += 1
+
+        self.cmap[value] = color
+        return color
+
+    def domain(self, values):
+        for v in values:
+            self._map(v)
