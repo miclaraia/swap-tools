@@ -166,6 +166,9 @@ class Plotter:
 
     @staticmethod
     def get_value(trial, key):
+        """
+        Fetch a value from a trial using a key mapping
+        """
         if key is not None:
             if key == 'golds':
                 return len(trial.golds)
@@ -262,7 +265,7 @@ class Plotter:
 
     def run(self):
         fname = self.fname
-        seaborn.reset_orig()
+        sns.reset_orig()
 
         for i, plots in self.plots.items():
             print('Plot %d' % i)
@@ -406,9 +409,13 @@ class Plotter:
 
 class DiscreteColorMap:
 
-    colors = ["#9b59b6", "#3498db", "#707070", "#e74c3c", "#34495e", "#2ecc71"]
 
-    def __init__(self):
+    def __init__(self, colors=None):
+        if colors is None:
+            colors = [
+                "#9b59b6", "#3498db", "#707070",
+                "#e74c3c", "#34495e", "#2ecc71"]
+        self.colors = colors
         self.cmap = {}
         self.i = 0
 
@@ -416,6 +423,8 @@ class DiscreteColorMap:
         return self.color(value)
 
     def color(self, value):
+        if self.i >= len(self.colors):
+            self.i = 0
         if value in self.cmap:
             return self.cmap[value]
         return self._map(value)
