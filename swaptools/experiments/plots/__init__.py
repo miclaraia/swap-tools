@@ -27,17 +27,15 @@ class Plotter:
 
     @plot
     def plot_2d(
-        self, ax, x_key, y_key,
-        axes=None, title=None, pltargs=None, **kwargs):
+            self, ax, x_key, y_key,
+            axes=None, title=None, pltargs=None, **kwargs):
+
+        keys = (x_key, y_key)
+
         if pltargs is None:
             pltargs = {}
 
-        data = []
-        for trial in self.trials:
-            x = self.get_value(trial, x_key)
-            y = self.get_value(trial, y_key)
-            data.append((x, y))
-
+        data = self.get_data((x_key, y_key))
         x, y = zip(*data)
         ax.scatter(x, y, **pltargs)
 
@@ -50,17 +48,14 @@ class Plotter:
     @plot
     def plot_3d(
             self, ax, x_key, y_key, c_key,
-            axes=None, title=None, pltargs=None, **kwargs):
+            axes=None, pltargs=None, **kwargs):
+
+        keys = (x_key, y_key, c_key)
+
         if pltargs is None:
             pltargs = {}
 
-        data = []
-        for trial in self.trials:
-            x = self.get_value(trial, x_key)
-            y = self.get_value(trial, y_key)
-            c = self.get_value(trial, c_key)
-
-            data.append((x, y, c))
+        data = self.get_data(keys)
         x, y, c = zip(*data)
 
         cmap = None
