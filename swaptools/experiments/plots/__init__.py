@@ -25,9 +25,13 @@ class Plotter:
         print(len(experiment._trials), len(self.trials))
 
     @plot
-    def plot_2d(self, ax, x_key, y_key, axes=None, title=None, **kwargs):
+    def plot_2d(
+        self, ax, x_key, y_key,
+        axes=None, title=None, pltargs=None, **kwargs):
         if axes is None:
             axes = {}
+        if pltargs is None:
+            pltargs = {}
 
         data = []
         for trial in self.trials:
@@ -36,7 +40,7 @@ class Plotter:
             data.append((x, y))
 
         x, y = zip(*data)
-        ax.scatter(x, y, **kwargs)
+        ax.scatter(x, y, **pltargs)
 
         axes = self.axes(x_key, y_key, None, axes)
         if title is None:
@@ -46,9 +50,11 @@ class Plotter:
     @plot
     def plot_3d(
             self, ax, x_key, y_key, c_key,
-            axes=None, title=None, **kwargs):
+            axes=None, title=None, pltargs=None, **kwargs):
         if axes is None:
             axes = {}
+        if pltargs is None:
+            pltargs = {}
 
         data = []
         for trial in self.trials:
@@ -60,12 +66,14 @@ class Plotter:
         x, y, c = zip(*data)
         im = ax.scatter(x, y, c=c, cmap='viridis', **kwargs)
         self.figure.colorbar(im, ax=ax)
+        im = ax.scatter(x, y, c=c, **pltargs)
 
         axes = self.axes(x_key, y_key, c_key, axes)
         if title is None:
             title = '%(x)s and %(y)s vs %(c)s' % axes
         self.pretty(ax, axes['x'], axes['y'], title)
 
+        return ax
     #############################################################
 
     @staticmethod
@@ -112,8 +120,9 @@ class Plotter:
         self._kwargs = kwargs.copy()
 
     def plot(self, func, *args, **kwargs):
-        _kwargs = self.kwargs
-        _kwargs.update(kwargs)
+        plot_args = self.kwargs
+        plot_args.update(kwargs.get('pltargs', {}))
+        kwargs['pltargs'] = plot_args
 
         def inner(ax):
             func(self, ax, *args, **_kwargs)
