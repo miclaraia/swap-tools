@@ -164,6 +164,10 @@ class Interface(_Interface):
         parser.add_argument(
             '--golds', nargs='*')
 
+        parser.add_argument(
+            '--filter-golds', nargs=1
+        )
+
     @staticmethod
     def required():
         return ['fraction', 'series', 'golds']
@@ -190,3 +194,16 @@ class Interface(_Interface):
         e.run()
 
         return e
+
+    def plot(self, args, experiment):
+        if args.filter_golds:
+            r = []
+            golds = int(args.filter_golds[0])
+            for t in experiment.trials:
+                if len(t.golds) != golds:
+                    r.append(t.id)
+
+            for i in r:
+                experiment._trials.pop(i)
+
+        super().plot(args, experiment)
