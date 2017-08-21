@@ -158,6 +158,20 @@ class Plotter:
         """
         return [d for d in data if condition(d)]
 
+    @staticmethod
+    def find_domain(data, index=2):
+        """
+        Determine all the discrete values in the domain along an axis
+        """
+        domain = []
+        for d in data:
+            c = d[index]
+            if c not in domain and \
+                    c + 1 not in domain and \
+                    c - 1 not in domain:
+                domain.append(c)
+        return domain
+
     @property
     def kwargs(self):
         kwargs = {'s': 10, 'alpha': 1, 'cmap': 'viridis'}
