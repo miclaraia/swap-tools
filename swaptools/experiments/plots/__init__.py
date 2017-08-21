@@ -42,8 +42,7 @@ class Plotter:
         ax.scatter(x, y, **pltargs)
 
         axes = self.axes(keys, axes)
-        if title is None:
-            title = '%(x)s vs %(y)s' % axes
+        title = '%(x)s vs %(y)s' % axes
         self.pretty(ax, axes, title)
 
         return ax
@@ -87,9 +86,11 @@ class Plotter:
         if cmap is None:
             self.figure.colorbar(im, ax=ax)
 
-        if title is None:
-            title = '%(x)s and %(y)s vs %(c)s' % axes
         axes = self.axes(keys, axes)
+        title = '%(x)s and %(y)s vs %(c)s' % axes
+        self.pretty(ax, axes, title)
+
+        return ax
         self.pretty(ax, axes, title)
 
         return ax
@@ -201,6 +202,9 @@ class Plotter:
             if 'ylim' in kwargs:
                 left, right = kwargs['ylim']
                 ax.set_ylim(left, right)
+            if 'title' in kwargs:
+                ax.set_title(kwargs['title'])
+
 
         self.plots[self.figures].append(inner)
 
