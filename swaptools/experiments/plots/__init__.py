@@ -148,7 +148,14 @@ class Plotter:
         kwargs['pltargs'] = plot_args
 
         def inner(ax):
-            func(self, ax, *args, **_kwargs)
+            ax = func(self, ax, *args, **kwargs)
+            if 'xlim' in kwargs:
+                left, right = kwargs['xlim']
+                ax.set_xlim(left, right)
+            if 'ylim' in kwargs:
+                left, right = kwargs['ylim']
+                ax.set_ylim(left, right)
+
         self.plots[self.figures].append(inner)
 
     def reset(self):
