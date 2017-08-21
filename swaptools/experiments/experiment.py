@@ -373,11 +373,18 @@ class Interace(ui.Interface):
             Trial.interact_from_db(trial_id)
 
         if args.plot:
-            experiment_id = int(args.plot[0])
-            fname = self.f(args.plot[1])
-            e = self._experiment.from_db(experiment_id)
-            e.plot(fname)
+            e = self._plot_make_e(args)
+            self.plot(args, e)
 
         if args.shell:
             assert experiment
             code.interact(local=locals())
+
+    def _plot_make_e(self, args):
+        experiment_id = int(args.plot[0])
+        e = self._experiment.from_db(experiment_id)
+        return e
+
+    def plot(self, args, experiment):
+        fname = self.f(args.plot[1])
+        experiment.plot(fname)
