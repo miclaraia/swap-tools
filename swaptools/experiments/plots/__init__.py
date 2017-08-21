@@ -29,8 +29,6 @@ class Plotter:
     def plot_2d(
         self, ax, x_key, y_key,
         axes=None, title=None, pltargs=None, **kwargs):
-        if axes is None:
-            axes = {}
         if pltargs is None:
             pltargs = {}
 
@@ -43,10 +41,10 @@ class Plotter:
         x, y = zip(*data)
         ax.scatter(x, y, **pltargs)
 
-        axes = self.axes(x_key, y_key, None, axes)
+        axes = self.axes(keys, axes)
         if title is None:
             title = '%(x)s vs %(y)s' % axes
-        self.pretty(ax, axes['x'], axes['y'], title)
+        self.pretty(ax, axes, title)
 
         return ax
 
@@ -54,8 +52,6 @@ class Plotter:
     def plot_3d(
             self, ax, x_key, y_key, c_key,
             axes=None, title=None, pltargs=None, **kwargs):
-        if axes is None:
-            axes = {}
         if pltargs is None:
             pltargs = {}
 
@@ -91,30 +87,40 @@ class Plotter:
         if cmap is None:
             self.figure.colorbar(im, ax=ax)
 
-        axes = self.axes(x_key, y_key, c_key, axes)
         if title is None:
             title = '%(x)s and %(y)s vs %(c)s' % axes
-        self.pretty(ax, axes['x'], axes['y'], title)
+        axes = self.axes(keys, axes)
+        self.pretty(ax, axes, title)
 
         return ax
     #############################################################
 
     @staticmethod
-    def axes(x, y, c, axes):
+    def axes(keys, axes):
+        """
+        Define axis labels using the key mapping if it
+        is not already specified
+        """
+        if axes is None:
+            axes = {}
+
+        x, y = keys[:2]
         if 'x' not in axes:
             axes['x'] = x.split('.')[-1].title()
         if 'y' not in axes:
             axes['y'] = y.split('.')[-1].title()
-        if c is not None and 'c' not in axes:
-            axes['c'] = c.split('.')[-1].title()
+        if len(keys) > 2:
+            c = keys[2]
+            if c is not None and 'c' not in axes:
+                axes['c'] = c.split('.')[-1].title()
 
         return axes
 
 
     @staticmethod
-    def pretty(ax, x, y, title):
-        ax.set_xlabel(x)
-        ax.set_ylabel(y)
+    def pretty(ax, axes, title):
+        ax.set_xlabel(axes['x'])
+        ax.set_ylabel(axes['y'])
         ax.set_title(title)
 
     @staticmethod
