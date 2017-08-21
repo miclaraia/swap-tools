@@ -132,6 +132,24 @@ class Plotter:
 
             return value
 
+    def get_data(self, keys):
+        """
+        Get multiple values from each trial.
+
+        Parameters
+        ----------
+
+        keys
+            list of value mappings to fetch
+        """
+        data = []
+        for t in self.trials:
+            values = []
+            for k in keys:
+                values.append(self.get_value(t, k))
+            data.append(values)
+
+        return data
     @property
     def kwargs(self):
         kwargs = {'s': 10, 'alpha': 1, 'cmap': 'viridis'}
