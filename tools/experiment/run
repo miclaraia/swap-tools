@@ -1,13 +1,11 @@
 #!/bin/bash
-set -o pipefail
 
-ROOT=$(dirname "${VAR}")
 source $HOME/.virtualenv/swap/bin/activate
+set -euo pipefail
 
-set -eu
-
-ROOT=$(readlink -f "${ROOT}")
+ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 CONFIG=$ROOT/experiment_config.py
+
 echo "Running from $ROOT"
 echo $SWAPLOG
 
