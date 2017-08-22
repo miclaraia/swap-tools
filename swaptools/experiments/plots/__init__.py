@@ -74,18 +74,16 @@ class Plotter:
     @plot
     def plot_2d(
             self, ax, x_key, y_key,
-            axes=None, title=None, pltargs=None, **kwargs):
+            kwargs):
 
-        keys = (x_key, y_key)
+        kwargs['keys'] = (x_key, y_key)
+        pltargs = self.plot_args()
 
-        if pltargs is None:
-            pltargs = {}
-
-        data = self.get_data((x_key, y_key))
+        data = self.get_data()
         x, y = zip(*data)
         ax.scatter(x, y, **pltargs)
 
-        axes = self.axes(keys, axes)
+        axes = self.axes()
         title = '%(x)s vs %(y)s' % axes
         self.pretty(ax, axes, title)
 
@@ -94,40 +92,35 @@ class Plotter:
     @plot
     def plot_3d(
             self, ax, x_key, y_key, c_key,
-            axes=None, pltargs=None, **kwargs):
+            kwargs):
 
-        keys = (x_key, y_key, c_key)
+        kwargs['keys'] = (x_key, y_key, c_key)
+        pltargs = self.plot_args()
 
-        if pltargs is None:
-            pltargs = {}
-
-        data = self.get_data(keys)
+        data = self.get_data()
         x, y, c = zip(*data)
 
+        print(kwargs())
+
         cmap = None
-        if pltargs.get('cmap') == 'discrete':
-            pltargs['cmap'] = None
+        if kwargs.get('discrete') is True:
             cmap = DiscreteColorMap()
 
-            if 'domain' in pltargs:
-                cmap.domain(pltargs['domain'])
-                pltargs.pop('domain')
+            if 'domain' in kwargs:
+                domain = kwargs.pop('domain')
+                cmap.domain(domain)
 
             c = list(c)
             for i, v in enumerate(c):
                 c[i] = cmap(v)
 
-            patches = []
-            for value, color in cmap.cmap.items():
-                patch = mpatches.Patch(color=color, label=value)
-                patches.append(patch)
-            ax.legend(handles=patches)
+            self.color_legend(ax, cmap)
 
         im = ax.scatter(x, y, c=c, **pltargs)
         if cmap is None:
             self.figure.colorbar(im, ax=ax)
 
-        axes = self.axes(keys, axes)
+        axes = self.axes()
         title = '%(x)s and %(y)s vs %(c)s' % axes
         self.pretty(ax, axes, title)
 
