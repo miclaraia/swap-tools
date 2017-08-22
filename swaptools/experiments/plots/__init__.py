@@ -64,8 +64,10 @@ class Plotter:
         self.fname = fname
         self.plots = {0: []}
         self.figure = None
-        self._kwargs = {}
-        # self.trials = list(Experiment.from_db(experiment).trials)
+
+        self.plot_args = Args({'s': 10, 'alpha': 1, 'cmap': 'viridis'})
+        self.kwargs = Args()
+
         self.trials = list(experiment.trials)
         print(len(experiment._trials), len(self.trials))
 
@@ -179,14 +181,13 @@ class Plotter:
 
     #############################################################
 
-    @staticmethod
-    def axes(keys, axes):
+    def axes(self):
         """
         Define axis labels using the key mapping if it
         is not already specified
         """
-        if axes is None:
-            axes = {}
+        axes = self.kwargs.get('axes', {})
+        keys = self.kwargs['keys']
 
         x, y = keys[:2]
         if 'x' not in axes:
@@ -225,16 +226,15 @@ class Plotter:
 
             return value
 
-    def get_data(self, keys):
+    def get_data(self, kwargs=None):
         """
         Get multiple values from each trial.
-
-        Parameters
-        ----------
-
-        keys
-            list of value mappings to fetch
         """
+        if kwargs is None:
+            kwargs = self.kwargs
+
+        keys = kwargs['keys']
+
         data = []
         for t in self.trials:
             values = []
@@ -265,23 +265,22 @@ class Plotter:
                 domain.append(c)
         return domain
 
-    @property
-    def kwargs(self):
-        kwargs = {'s': 10, 'alpha': 1, 'cmap': 'viridis'}
-        kwargs.update(self._kwargs)
-        return kwargs
-
-    @kwargs.setter
-    def kwargs(self, kwargs):
-        self._kwargs = kwargs.copy()
-
     def plot(self, func, *args, **kwargs):
-        plot_args = self.kwargs
+        plot_args = self.plot_args()
         plot_args.update(kwargs.get('pltargs', {}))
         kwargs['pltargs'] = plot_args
 
+        defaults = self.kwargs.defaults()
+
         def inner(ax):
-            ax = func(self, ax, *args, **kwargs)
+            self.kwargs._reset()
+            self.kwargs.update(defaults)
+            self.kwargs.update(kwargs)
+            print(self.kwargs.defaults())
+            print(self.kwargs())
+
+            ax = func(self, ax, *args, self.kwargs)
+
             if 'xlim' in kwargs:
                 left, right = kwargs['xlim']
                 ax.set_xlim(left, right)
@@ -298,11 +297,16 @@ class Plotter:
         self.plots = []
         self.figure = None
 
-    def next(self, kwargs=None):
+    def next(self, pltargs=None, kwargs=None):
+        self.plot_args._reset()
+        if pltargs is not None:
+            self.plot_args.update(pltargs)
+
         if kwargs is None:
-            self.kwargs = {}
+            self.kwargs.set_defaults({})
         else:
-            self.kwargs = kwargs.copy()
+            self.kwargs.set_defaults(kwargs)
+
         self.figures += 1
         self.plots[self.figures] = []
 
