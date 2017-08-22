@@ -388,3 +388,52 @@ class Interace(ui.Interface):
     def plot(self, args, experiment):
         fname = self.f(args.plot[1])
         experiment.plot(fname)
+
+
+class SampleExperiment(Experiment):
+
+    @classmethod
+    def new(cls, value1, value2, *args, **kwargs):
+        # Generate the experiment with the appropriate id
+        # name, and description
+        e = super().new(*args, **kwargs)
+
+        # Set the names of the value iterators
+        value1._name('value1')
+        value2._name('value2')
+
+        # Assign the value iterators instance variable
+        e.values = [value1, value2]
+
+        return e
+
+    def setup(self):
+        """
+        Perform any initial setup operations
+        """
+        # super().setup()
+        pass
+
+    def setup_first(self):
+        """
+        Any operations that need to happen after initial setup
+        but before the first trial, specific only to the first trial
+        """
+        pass
+
+    def setup_next(self):
+        """
+        Prepare the next experiment environment
+        """
+        pass
+
+    def has_next(self):
+        """
+        Check if there is another trial
+        """
+        pass
+
+    def _plot(self, p):
+        """
+        Plotting for this experiment
+        """
