@@ -14,6 +14,10 @@ class ValueIterator:
     def list(values):
         return _List(values)
 
+    @staticmethod
+    def single(value):
+        return _Single(value)
+
     ###############################################################
 
 
@@ -76,6 +80,19 @@ class _Range(_Iterator):
         return math.floor((self.end - self.start) / self._step) + 1
 
 
+class _Single(_Iterator):
+
+    def __init__(self, value, name=None):
+        super().__init__(name)
+        self.current = value
+
+    def more(self):
+        return False
+
+    def count(self):
+        return 1
+
+
 class _List(_Iterator):
 
     def __init__(self, values, name=None):
@@ -109,3 +126,5 @@ class _List(_Iterator):
 
     def count(self):
         return len(self.values)
+
+
