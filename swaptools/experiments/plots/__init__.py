@@ -129,46 +129,35 @@ class Plotter:
     @plot
     def plot_kde(
             self, ax, x_key, y_key, c_key,
-            axes=None, title=None, pltargs=None, **kwargs):
+            kwargs):
 
+        kwargs['keys'] = (x_key, y_key, c_key)
 
-
-        keys = (x_key, y_key, c_key)
-        if pltargs is None:
-            pltargs = {}
-
-        data = self.get_data(keys)
+        data = self.get_data()
 
         if 'domain' in kwargs:
             domain = kwargs['domain']
         else:
             domain = self.find_domain(data)
 
-        def cond(value):
-            def f(data_point):
-                c = data_point[2]
-                return c - value < 2
-            return f
-
         print(domain)
         colors = ['Blues', 'Reds', 'Greens', 'Purples']
         cmap = DiscreteColorMap(colors)
-        for d in domain:
-            filtered = self.filter_data(data, cond(d))
-            x, y, _ = zip(*filtered)
-            x = np.array(x)
-            y = np.array(y)
-            sns.kdeplot(
-                x, y, cmap=cmap(d),
-                shade=True, shade_lowest=False,
-                alpha=.7)
-            print(d)
+        cmap.domain(domain)
 
-        if axes is None:
-            axes = {}
-        axes = self.axes(keys, axes)
+        data = self.get_data()
+        x, y, _ = zip(*data)
+        x = np.array(x)
+        y = np.array(y)
+        sns.kdeplot(
+            x, y, cmap=cmap(data[0][2]),
+            shade=True, shade_lowest=False,
+            alpha=.7)
+
+        axes = self.axes()
         title = '%(x)s vs %(y)s kernel density' % axes
         self.pretty(ax, axes, title)
+        self.color_legend(ax, cmap)
 
         return ax
 
