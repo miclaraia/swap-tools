@@ -4,6 +4,8 @@ import swaptools.experiments.config as config
 import swaptools.experiments.db.experiment as edb
 import swaptools.experiments.db.trials as tdb
 
+from swaptools.experiments.iterators import ValueIterator as VI
+
 from unittest.mock import patch, MagicMock
 import pytest
 
@@ -17,7 +19,12 @@ def override():
 
 
 def generate():
-    e = Prior(None, None, None, (.2, .8, .2), 100, 3)
+    prior = VI.range(.2, .8, .2)
+    golds = VI.single(100)
+    series = VI.range(1, 3, 1)
+    kwargs = {'name': None, 'description': None}
+
+    e = Prior.new(prior, golds, series, **kwargs)
 
     gg = MagicMock()
     gg.golds = {i: i for i in range(200)}
