@@ -34,7 +34,7 @@ def generate():
 
 
 # pylint: disable=W0613,W0621,R0201
-class TestRandomGolds:
+class TestGoldProportions:
 
     def test_setup_next_first(self, override):
         e = generate()
