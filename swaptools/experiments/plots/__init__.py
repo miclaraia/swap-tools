@@ -252,6 +252,10 @@ class Plotter:
                 values.append(self.get_value(t, k))
             data.append(values)
 
+        if 'filter' in self.kwargs:
+            print(self.kwargs['filter'])
+            data = self.filter_data(data, self.kwargs['filter'])
+
         return data
 
     @staticmethod
