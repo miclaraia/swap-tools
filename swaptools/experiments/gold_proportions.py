@@ -10,16 +10,17 @@ logger = logging.getLogger(__name__)
 
 class GoldProportions(Experiment):
 
-    def __init__(self, experiment, name, description,
-                 num_golds=None, fraction=None, series=None):
-        super().__init__(experiment, name, description)
+    @classmethod
+    def new(cls, num_golds, fraction, series, *args, **kwargs):
+        e = super().new(*args, **kwargs)
 
-        if num_golds and fraction and series:
-            series._name('series')
-            fraction._name('fraction')
-            num_golds._name('golds')
+        series._name('series')
+        fraction._name('fraction')
+        num_golds._name('golds')
 
-        self.values = [series, fraction, num_golds]
+        e.values = [series, fraction, num_golds]
+
+        return e
 
     def setup_next(self):
         info = self.trial_info

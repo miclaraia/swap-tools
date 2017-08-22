@@ -22,9 +22,8 @@ def generate():
     golds = ValueIterator.list([50, 100, 200])
     fraction = ValueIterator.range(.05, .95, .05)
     series = ValueIterator.range(1, 3, 1)
-    e = GoldProportions(
-        None, None, None,
-        golds, fraction, series)
+    kwargs = {'name': None, 'description': None}
+    e = GoldProportions.new(golds, fraction, series, **kwargs)
 
     gg = MagicMock()
     gg.golds = {i: i for i in range(200)}
