@@ -4,6 +4,8 @@ import swaptools.experiments.config as config
 import swaptools.experiments.db.experiment as edb
 import swaptools.experiments.db.trials as tdb
 
+from swaptools.experiments.iterators import ValueIterator
+
 from unittest.mock import patch, MagicMock
 import pytest
 
@@ -17,9 +19,12 @@ def override():
 
 
 def generate():
-    e = Controversial(
-        None, None, None,
-        1000, (100, 200, 100), (100, 200, 100))
+    cv = ValueIterator.range(100, 200, 100)
+    cn = ValueIterator.range(100, 200, 100)
+    golds = ValueIterator.range(100, 100, 1)
+    kwargs = {'name': None, 'description': None}
+
+    e = Controversial.new(golds, cv, cn, **kwargs)
 
     gg = MagicMock()
     gg.golds = {i: i for i in range(200)}
@@ -40,45 +45,57 @@ class TestControversial:
 
     def test_setup_next_first(self, override):
         e = generate()
-        e.setup_next()
+        e._setup_next()
 
-        assert e.trial_info == {'n': 0, 'cv': 100, 'cn': 100, 'golds': 200}
+        assert e.trial_info == {
+            'n': 0,
+            'cv': 100,
+            'cn': 100,
+            'seed': 100
+        }
 
     def test_setup_next(self, override):
         e = generate()
-        e.setup_next()
-        e.setup_next()
+        e._setup_next()
+        e._setup_next()
 
-        assert e.trial_info == {'n': 1, 'cv': 200, 'cn': 100, 'golds': 200}
+        assert e.trial_info == {
+            'n': 1,
+            'cv': 200,
+            'cn': 100,
+            'seed': 100
+        }
 
     def test_rollover(self, override):
         e = generate()
-        info = {'n': 0, 'cv': 200, 'cn': 100, 'golds': 200}
-        e.setup_increment(info)
+        e.n = 4
+        e.values[0].current = 200
+        e.values[1].current = 100
 
-        print(info)
-        assert info == {'n': 1, 'cv': 100, 'cn': 200, 'golds': 200}
+        e._setup_next()
 
-    def test_increment(self, override):
-        e = generate()
-        info = {'n': 1, 'cv': 100, 'cn': 100, 'golds': 200}
-        e.setup_increment(info)
-
-        assert info == {'n': 2, 'cv': 200, 'cn': 100, 'golds': 200}
+        assert e.trial_info == {
+            'n': 5,
+            'cv': 100,
+            'cn': 200,
+            'seed': 100
+        }
 
     def test_has_next_true(self, override):
         e = generate()
-        info = {'n': 0, 'cv': 200, 'cn': 100, 'golds': 200}
-        e.setup_increment(info)
+        e.n = 4
+        e.values[0].current = 200
+        e.values[1].current = 100
 
-        assert e.has_next(info) is True
+        assert e.has_next() is True
 
     def test_has_next_false(self, override):
         e = generate()
-        info = {'n': 0, 'cv': 200, 'cn': 200, 'golds': 200}
-        e.setup_increment(info)
+        e.n = 4
+        e.values[0].current = 200
+        e.values[1].current = 200
 
-        assert e.has_next(info) is False
+        assert e.has_next() is False
 
     def test_count(self, override):
         e = generate()
