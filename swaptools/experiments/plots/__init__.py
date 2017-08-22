@@ -14,6 +14,49 @@ def plot(func):
     return wrapper
 
 
+class Args:
+
+    def __init__(self, defaults=None):
+        self.args = {}
+
+        if defaults is None:
+            defaults = {}
+        self._defaults = defaults
+
+    def __call__(self):
+        args = self.defaults()
+        args.update(self.args)
+        return args
+
+    def __getitem__(self, key):
+        return self.args.get(key)
+
+    def __contains__(self, key):
+        return key in self.args
+
+    def __setitem__(self, key, value):
+        self.args[key] = value
+
+    def get(self, key, *args):
+        return self.args.get(key, *args)
+
+    def pop(self, key):
+        return self.args.pop(key)
+
+    def update(self, args):
+        self.args.update(args)
+
+    def _reset(self):
+        self.args = self.defaults()
+
+    def defaults(self):
+        return self._defaults.copy()
+
+    def set_defaults(self, defaults):
+        self._defaults = {}
+        self._defaults.update(defaults)
+
+
 class Plotter:
     figures = 0
 
