@@ -209,6 +209,16 @@ class Plotter:
         ax.set_title(title)
 
     @staticmethod
+    def color_legend(ax, cmap):
+        patches = []
+        for value, color in cmap.cmap.items():
+            if color[-1] == 's':
+                color = color[:-1].lower()
+            patch = mpatches.Patch(color=color, label=value)
+            patches.append(patch)
+        ax.legend(handles=patches)
+
+    @staticmethod
     def get_value(trial, key):
         """
         Fetch a value from a trial using a key mapping
