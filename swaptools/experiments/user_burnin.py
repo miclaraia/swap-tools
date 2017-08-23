@@ -1,6 +1,7 @@
 
 import swap.config as config
 
+from swaptools.experiments.iterators import ValueIterator as VI
 from swaptools.experiments.experiment import Experiment
 from swaptools.experiments.experiment import Interace as _Interface
 
@@ -10,41 +11,21 @@ logger = logging.getLogger(__name__)
 
 class UserBurnin(Experiment):
 
-    def __init__(self, experiment, name, description,
-                 gamma=None, num_golds=None):
-        super().__init__(experiment, name, description)
+    @classmethod
+    def new(cls, gamma, num_golds, *args, **kwargs):
+        e = super().new(*args, **kwargs)
 
-        if gamma is None:
-            gamma = (1, 5, 1)
-        if num_golds is None:
-            num_golds = 1000
+        gamma._name('gamma')
+        num_golds._name('golds')
 
-        self.gamma = gamma
-        self.num_golds = num_golds
-        self.trial_info.update({'gamma': 0})
-
-    @staticmethod
-    def info_key_order():
-        return ['n', 'gamma']
-
-    def has_next(self, info):
-        return info['gamma'] <= self.gamma[1]
-
-    def setup(self):
-        super().setup()
-        self.gg.random(self.num_golds)
-
-    def setup_first(self, info):
-        super().setup_first(info)
-        info['gamma'] = self.gamma[0]
-
-    def setup_increment(self, info):
-        super().setup_increment(info)
-        info['gamma'] += self.gamma[2]
+        e.values = VI(gamma, num_golds)
+        return e
 
     def setup_next(self):
-        super().setup_next()
         info = self.trial_info
+
+        if self.values['gamma'].first():
+            self.gg.random(info['golds'])
 
         config.gamma = info['gamma']
 
@@ -187,11 +168,11 @@ class Interface(_Interface):
         }
         if args.num_golds:
             golds = int(args.num_golds[0])
-            kwargs['num_golds'] = golds
+            kwargs['num_golds'] = VI.single(golds)
 
         if args.gamma:
-            gamma = [int(i) for i in args.gamma[0:3]]
-            kwargs['gamma'] = tuple(gamma)
+            a = [int(i) for i in args.gamma[:3]]
+            kwargs['gamma'] = VI.range(*a)
 
         e = UserBurnin.new(**kwargs)
         e.run()
