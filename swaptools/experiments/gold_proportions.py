@@ -1,5 +1,5 @@
 
-from swaptools.experiments.iterators import ValueIterator
+from swaptools.experiments.iterators import ValueIterator as VI
 from swaptools.experiments.experiment import Experiment
 from swaptools.experiments.experiment import Interace as _Interface
 
@@ -18,7 +18,7 @@ class GoldProportions(Experiment):
         fraction._name('fraction')
         num_golds._name('golds')
 
-        e.values = [series, fraction, num_golds]
+        e.values = VI(series, fraction, num_golds)
 
         return e
 
@@ -209,15 +209,15 @@ class Interface(_Interface):
         }
         if args.fraction:
             a = [float(i) for i in args.fraction[:3]]
-            kwargs['fraction'] = ValueIterator.range(*a)
+            kwargs['fraction'] = VI.range(*a)
 
         if args.series:
             series = int(args.series[0])
-            kwargs['series'] = ValueIterator.range(1, series, 1)
+            kwargs['series'] = VI.range(1, series, 1)
 
         if args.golds:
             a = [int(i) for i in args.golds]
-            kwargs['num_golds'] = ValueIterator.list(a)
+            kwargs['num_golds'] = VI.list(a)
 
         e = GoldProportions.new(**kwargs)
         e.run()

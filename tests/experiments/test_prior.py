@@ -64,7 +64,7 @@ class TestPrior:
         e = generate()
 
         e.n = 4
-        e.values[0].current = .8
+        e.values['prior'].current = .8
         e._setup_next()
 
         assert e.trial_info == {
@@ -78,8 +78,8 @@ class TestPrior:
         e = generate()
 
         e.n = 4
-        e.values[0].current = .8
-        e.values[1].current = 2
+        e.values['prior'].current = .8
+        e.values['series'].current = 2
 
         assert e.has_next() is True
 
@@ -87,8 +87,8 @@ class TestPrior:
         e = generate()
 
         e.n = 4
-        e.values[0].current = .8
-        e.values[1].current = 3
+        e.values['prior'].current = .8
+        e.values['series'].current = 3
 
         assert e.has_next() is False
 

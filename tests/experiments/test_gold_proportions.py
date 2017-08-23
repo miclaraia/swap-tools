@@ -62,9 +62,9 @@ class TestGoldProportions:
     def test_rollover_1(self, override):
         e = generate()
         e.n = 4
-        e.values[0].current = 3
-        e.values[1].current = .05
-        e.values[2].i = 0
+        e.values['series'].current = 3
+        e.values['fraction'].current = .05
+        e.values['golds'].current = 50
 
         e._setup_next()
 
@@ -79,9 +79,9 @@ class TestGoldProportions:
     def test_rollover_2(self, override):
         e = generate()
         e.n = 4
-        e.values[0].current = 3
-        e.values[1].current = .95
-        e.values[2].i = 1
+        e.values['series'].current = 3
+        e.values['fraction'].current = .95
+        e.values['golds'].current = 100
 
         e._setup_next()
 
@@ -97,11 +97,11 @@ class TestGoldProportions:
         e = generate()
 
         e.n = 4
-        e.values[0].current = 3
-        e.values[1].current = .90
-        e.values[2].i = 2
+        e.values['series'].current = 3
+        e.values['fraction'].current = .90
+        e.values['golds'].current = 200
 
-        print(e.values[1].more())
+        print(e.values['fraction'].more())
 
         assert e.has_next() is True
 
@@ -109,9 +109,9 @@ class TestGoldProportions:
         e = generate()
 
         e.n = 4
-        e.values[0].current = 3
-        e.values[1].current = .95
-        e.values[2].i = 2
+        e.values['series'].current = 3
+        e.values['fraction'].current = .95
+        e.values['golds'].current = 200
         assert e.has_next() is False
 
     def test_count(self, override):

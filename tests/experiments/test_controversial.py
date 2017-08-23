@@ -69,8 +69,8 @@ class TestControversial:
     def test_rollover(self, override):
         e = generate()
         e.n = 4
-        e.values[0].current = 200
-        e.values[1].current = 100
+        e.values['cv'].current = 200
+        e.values['cn'].current = 100
 
         e._setup_next()
 
@@ -84,16 +84,16 @@ class TestControversial:
     def test_has_next_true(self, override):
         e = generate()
         e.n = 4
-        e.values[0].current = 200
-        e.values[1].current = 100
+        e.values['cv'].current = 200
+        e.values['cn'].current = 100
 
         assert e.has_next() is True
 
     def test_has_next_false(self, override):
         e = generate()
         e.n = 4
-        e.values[0].current = 200
-        e.values[1].current = 200
+        e.values['cv'].current = 200
+        e.values['cn'].current = 200
 
         assert e.has_next() is False
 

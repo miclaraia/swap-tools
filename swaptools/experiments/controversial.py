@@ -1,4 +1,5 @@
 
+from swaptools.experiments.iterators import ValueIterator as VI
 from swaptools.experiments.experiment import Experiment
 from swaptools.experiments.experiment import Interace as _Interface
 
@@ -20,7 +21,7 @@ class Controversial(Experiment):
         consensus._name('cn')
         num_golds._name('seed')
 
-        e.values = [controversial, consensus, num_golds]
+        e.values = VI(controversial, consensus, num_golds)
 
         return e
 
@@ -236,11 +237,11 @@ class Interface(_Interface):
 
         if args.controversial:
             a = [int(i) for i in args.controversial[0:3]]
-            kwargs['controversial'] = ValueIterator.range(*a)
+            kwargs['controversial'] = VI.range(*a)
 
         if args.consensus:
             a = [int(i) for i in args.consensus[0:3]]
-            kwargs['consensus'] = ValueIterator.range(*a)
+            kwargs['consensus'] = VI.range(*a)
 
         e = Controversial.new(**kwargs)
         e.run()

@@ -19,7 +19,7 @@ class Prior(Experiment):
         num_golds._name('golds')
         series._name('series')
 
-        e.values = [prior, series, num_golds]
+        e.values = VI(prior, series, num_golds)
 
         return e
 

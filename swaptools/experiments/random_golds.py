@@ -1,5 +1,5 @@
 
-from swaptools.experiments.iterators import ValueIterator
+from swaptools.experiments.iterators import ValueIterator as VI
 from swaptools.experiments.experiment import Experiment
 from swaptools.experiments.experiment import Interace as _Interface
 
@@ -9,18 +9,6 @@ logger = logging.getLogger(__name__)
 
 class RandomGolds(Experiment):
 
-    def __init__(self, experiment, name, description,
-                 num_golds=None, num_trials=10):
-        super().__init__(experiment, name, description)
-
-        if num_golds is None:
-            num_golds = (1000, 2000, 1000)
-
-        self.num_golds = num_golds
-        self.num_trials = num_trials
-
-        self.trial_info.update({'golds': 0})
-
     @classmethod
     def new(cls, num_golds, series, *args, **kwargs):
         e = super().new(*args, **kwargs)
@@ -28,7 +16,7 @@ class RandomGolds(Experiment):
         series._name('series')
         num_golds._name('golds')
 
-        e.values = [series, num_golds]
+        e.values = VI(series, num_golds)
 
         return e
 
@@ -147,11 +135,11 @@ class Interface(_Interface):
         }
         if args.num_golds:
             a = [int(i) for i in args.num_golds[0:3]]
-            kwargs['num_golds'] = ValueIterator.range(*a)
+            kwargs['num_golds'] = VI.range(*a)
 
         if args.num_trials:
             series = int(args.num_trials[0])
-            kwargs['series'] = ValueIterator.range(1, series, 1)
+            kwargs['series'] = VI.range(1, series, 1)
 
         e = RandomGolds.new(**kwargs)
         e.run()

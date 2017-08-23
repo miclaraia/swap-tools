@@ -1,10 +1,25 @@
 
 import math
+from collections import OrderedDict
 
 
 class ValueIterator:
 
     ###############################################################
+
+    def __init__(self, *args):
+        values = [(v.name, v) for v in args]
+        self.values = OrderedDict(values)
+
+    def __getitem__(self, key):
+        return self.values[key]
+
+    def __setitem__(self, key, value):
+        self.values[key] = value
+
+    def __iter__(self):
+        for v in self.values.values():
+            yield v
 
     @staticmethod
     def range(start, end, step):
@@ -106,7 +121,11 @@ class _List(_Iterator):
 
     @current.setter
     def current(self, value):
-        pass
+        if value is not None:
+            for i, v in enumerate(self.values):
+                if v == value:
+                    self.i = i
+                    return
 
     def next(self):
         if self.more():
