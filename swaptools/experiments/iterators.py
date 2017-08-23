@@ -52,6 +52,9 @@ class _Iterator:
     def more(self):
         pass
 
+    def first(self):
+        pass
+
     def reset(self):
         pass
 
@@ -88,6 +91,9 @@ class _Range(_Iterator):
             return self.next() - self.end < 1e-9
         return self.next() <= self.end
 
+    def first(self):
+        return self.current == self.start
+
     def reset(self):
         self.current = self.start
 
@@ -103,6 +109,9 @@ class _Single(_Iterator):
 
     def more(self):
         return False
+
+    def first(self):
+        return True
 
     def count(self):
         return 1
@@ -140,10 +149,11 @@ class _List(_Iterator):
     def more(self):
         return self.i + 1 < len(self.values)
 
+    def first(self):
+        return self.i == 0
+
     def reset(self):
         self.i = 0
 
     def count(self):
         return len(self.values)
-
-
