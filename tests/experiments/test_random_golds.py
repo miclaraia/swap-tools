@@ -4,6 +4,8 @@ import swaptools.experiments.config as config
 import swaptools.experiments.db.experiment as edb
 import swaptools.experiments.db.trials as tdb
 
+from swaptools.experiments.iterators import ValueIterator
+
 from unittest.mock import patch, MagicMock
 import pytest
 
@@ -17,7 +19,11 @@ def override():
 
 
 def generate():
-    e = RandomGolds(None, None, None, (100, 200, 100), 5)
+    golds = ValueIterator.range(100, 200, 100)
+    series = ValueIterator.range(1, 5, 1)
+    kwargs = {'name': None, 'description': None}
+
+    e = RandomGolds.new(golds, series, **kwargs)
 
     gg = MagicMock()
     gg.golds = {i: i for i in range(200)}
@@ -32,44 +38,54 @@ class TestRandomGolds:
 
     def test_setup_next_first(self, override):
         e = generate()
-        e.setup_next()
+        e._setup_next()
 
-        assert e.trial_info == {'n': 0, 'golds': 100}
+        assert e.trial_info == {
+            'n': 0,
+            'series': 1,
+            'golds': 100
+        }
 
     def test_setup_next(self, override):
         e = generate()
-        e.setup_next()
-        e.setup_next()
+        e._setup_next()
+        e._setup_next()
 
-        assert e.trial_info == {'n': 1, 'golds': 100}
+        assert e.trial_info == {
+            'n': 1,
+            'series': 2,
+            'golds': 100
+        }
 
     def test_rollover(self, override):
         e = generate()
-        info = {'n': 4, 'golds': 100}
-        e.setup_increment(info)
+        e.n = 4
+        e.values['series'].current = 5
+        e.values['golds'].current = 100
 
-        assert info == {'n': 0, 'golds': 200}
+        e._setup_next()
 
-    def test_increment(self, override):
-        e = generate()
-        info = {'n': 0, 'golds': 100}
-        e.setup_increment(info)
-
-        assert info == {'n': 1, 'golds': 100}
+        assert e.trial_info == {
+            'n': 5,
+            'series': 1,
+            'golds': 200
+        }
 
     def test_has_next_true(self, override):
         e = generate()
-        info = {'n': 0, 'golds': 100}
-        e.setup_increment(info)
+        e.n = 4
+        e.values['series'].current = 5
+        e.values['golds'].current = 100
 
-        assert e.has_next(info) is True
+        assert e.has_next() is True
 
     def test_has_next_false(self, override):
         e = generate()
-        info = {'n': 4, 'golds': 200}
-        e.setup_increment(info)
+        e.n = 4
+        e.values['series'].current = 5
+        e.values['golds'].current = 200
 
-        assert e.has_next(info) is False
+        assert e.has_next() is False
 
     def test_count(self, override):
         e = generate()

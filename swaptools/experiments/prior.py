@@ -1,6 +1,7 @@
 
 import swap.config as config
 
+from swaptools.experiments.iterators import ValueIterator as VI
 from swaptools.experiments.experiment import Experiment
 from swaptools.experiments.experiment import Interace as _Interface
 
@@ -10,58 +11,24 @@ logger = logging.getLogger(__name__)
 
 class Prior(Experiment):
 
-    def __init__(self, experiment, name, description,
-                 prior=None, num_golds=None, num_trials=None):
-        super().__init__(experiment, name, description)
+    @classmethod
+    def new(cls, prior, num_golds, series, *args, **kwargs):
+        e = super().new(*args, **kwargs)
 
-        if prior is None:
-            prior = (.05, .95, .05)
-        if num_golds is None:
-            num_golds = 5000
-        if num_trials is None:
-            num_trials = 3
+        prior._name('prior')
+        num_golds._name('golds')
+        series._name('series')
 
-        self.prior = prior
-        self.num_golds = num_golds
-        self.num_trials = num_trials
-        self.trial_info.update({
-            'prior': None, 'golds': None, 'series': None})
+        e.values = VI(prior, series, num_golds)
 
-    @staticmethod
-    def info_key_order():
-        return ['n', 'series', 'prior', 'golds']
-
-    def has_next(self, info):
-        return info['series'] < self.num_trials
-
-    def setup(self):
-        super().setup()
-        self.gg.random(self.num_golds)
-
-    def setup_first(self, info):
-        super().setup_first(info)
-        info['prior'] = self.prior[0]
-        info['golds'] = self.num_golds
-        info['series'] = 0
-
-    def setup_increment(self, info):
-        super().setup_increment(info)
-        info['prior'] += self.prior[2]
-
-        if info['prior'] > self.prior[1]:
-            info['prior'] = self.prior[0]
-            info['series'] += 1
+        return e
 
     def setup_next(self):
-        series = self.trial_info['series']
-
-        super().setup_next()
         info = self.trial_info
 
-        if info['series'] != series:
-            gg = self.gg
-            gg.reset()
-            gg.random(info['golds'])
+        if info['series'] == 1:
+            self.gg.reset()
+            self.gg.random(info['golds'])
 
         config.p0 = info['prior']
 
@@ -157,7 +124,7 @@ class Interface(_Interface):
             '--prior', nargs=3)
 
         parser.add_argument(
-            '--num-trials', nargs=1
+            '--series', nargs=1
         )
 
     @staticmethod
@@ -171,15 +138,16 @@ class Interface(_Interface):
             'description': description,
         }
         if args.num_golds:
-            golds = int(args.num_golds[0])
-            kwargs['num_golds'] = golds
+            a = int(args.num_golds[0])
+            kwargs['num_golds'] = VI.single(a)
 
         if args.prior:
-            prior = [float(i) for i in args.prior[0:3]]
-            kwargs['prior'] = tuple(prior)
+            a = [float(i) for i in args.prior[0:3]]
+            kwargs['prior'] = VI.range(*a)
 
-        if args.num_trials:
-            kwargs['num_trials'] = int(args.num_trials[0])
+        if args.series:
+            series = int(args.num_trials[0])
+            kwargs['series'] = VI.range(1, series, 1)
 
         e = Prior.new(**kwargs)
         e.run()

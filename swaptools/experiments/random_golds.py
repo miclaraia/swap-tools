@@ -1,4 +1,5 @@
 
+from swaptools.experiments.iterators import ValueIterator as VI
 from swaptools.experiments.experiment import Experiment
 from swaptools.experiments.experiment import Interace as _Interface
 
@@ -8,43 +9,20 @@ logger = logging.getLogger(__name__)
 
 class RandomGolds(Experiment):
 
-    def __init__(self, experiment, name, description,
-                 num_golds=None, num_trials=10):
-        super().__init__(experiment, name, description)
+    @classmethod
+    def new(cls, num_golds, series, *args, **kwargs):
+        e = super().new(*args, **kwargs)
 
-        if num_golds is None:
-            num_golds = (1000, 2000, 1000)
+        series._name('series')
+        num_golds._name('golds')
 
-        self.num_golds = num_golds
-        self.num_trials = num_trials
+        e.values = VI(series, num_golds)
 
-        self.trial_info.update({'golds': 0})
-
-    @staticmethod
-    def info_key_order():
-        return ['n', 'golds']
-
-    def has_next(self, info):
-        n = info['n'] >= self.num_trials
-        golds = info['golds'] > self.num_golds[1]
-
-        return not (n or golds)
-
-    def setup_first(self, info):
-        super().setup_first(info)
-        info['golds'] = self.num_golds[0]
-
-    def setup_increment(self, info):
-        super().setup_increment(info)
-        if info['n'] >= self.num_trials:
-            info['n'] = 0
-            info['golds'] += self.num_golds[2]
+        return e
 
     def setup_next(self):
-        super().setup_next()
         info = self.trial_info
 
-        logger.info('%s %s', str(info), str(self.num_trials))
         self.gg.reset()
         self.gg.random(info['golds'])
 
@@ -156,11 +134,12 @@ class Interface(_Interface):
             'description': description,
         }
         if args.num_golds:
-            golds = [int(i) for i in args.num_golds[0:3]]
-            kwargs['num_golds'] = tuple(golds)
+            a = [int(i) for i in args.num_golds[0:3]]
+            kwargs['num_golds'] = VI.range(*a)
 
         if args.num_trials:
-            kwargs['num_trials'] = int(args.num_trials[0])
+            series = int(args.num_trials[0])
+            kwargs['series'] = VI.range(1, series, 1)
 
         e = RandomGolds.new(**kwargs)
         e.run()

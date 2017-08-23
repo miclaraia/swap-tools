@@ -1,4 +1,5 @@
 
+from swaptools.experiments.iterators import ValueIterator as VI
 from swaptools.experiments.experiment import Experiment
 from swaptools.experiments.experiment import Interace as _Interface
 
@@ -8,61 +9,44 @@ logger = logging.getLogger(__name__)
 
 class Controversial(Experiment):
 
-    def __init__(self, experiment, name, description,
-                 num_golds=None, controversial=None, consensus=None):
+    def __init__(self, experiment, name, description):
         super().__init__(experiment, name, description)
-
-        if num_golds is None:
-            num_golds = 5
-        if controversial is None:
-            controversial = (100, 200, 100)
-        if consensus is None:
-            consensus = (100, 200, 100)
-
-        self.num_golds = num_golds
-        self.num_cv = controversial
-        self.num_cn = consensus
-        self.trial_info.update({'golds': 0, 'cv': 0, 'cn': 0})
-
         self._golds = None
 
-    @staticmethod
-    def info_key_order():
-        return ['n', 'golds', 'cv', 'cn']
+    @classmethod
+    def new(cls, num_golds, controversial, consensus, *args, **kwargs):
+        e = super().new(*args, **kwargs)
 
-    def has_next(self, info):
-        return info['cn'] <= self.num_cn[1]
+        controversial._name('cv')
+        consensus._name('cn')
+        num_golds._name('seed')
+
+        e.values = VI(controversial, consensus, num_golds)
+
+        return e
 
     def setup(self):
         super().setup()
 
+        info = self.trial_info
+        cv = info['cv']
+        cn = info['cn']
+        seed = info['seed']
+
         gg = self.gg
         self._golds = {
-            'seed': gg.random(self.num_golds)(),
-            'cv': list(gg.controversial(self.num_cv[1])()),
-            'cn': list(gg.consensus(self.num_cn[1])())
+            'seed': list(gg.random(seed)()),
+            'cv': list(gg.controversial(cv)()),
+            'cn': list(gg.consensus(cn)())
         }
 
-    def setup_first(self, info):
-        super().setup_first(info)
-        info['cv'] = self.num_cv[0]
-        info['cn'] = self.num_cn[0]
-
-    def setup_increment(self, info):
-        super().setup_increment(info)
-
-        info['cv'] += self.num_cv[2]
-        if info['cv'] > self.num_cv[1]:
-            info['cv'] = self.num_cv[0]
-            info['cn'] += self.num_cn[2]
-
     def setup_next(self):
-        super().setup_next()
         info = self.trial_info
 
+        # TODO: Ensure there is no overlap between these subjects
         gg = self.gg
         gg.reset()
-        gg.these(self._golds['seed'])
+        gg.subjects(self._golds['seed'])
         gg.subjects(self._golds['cv'][:info['cv']])
         gg.subjects(self._golds['cn'][:info['cn']])
 
@@ -252,12 +236,12 @@ class Interface(_Interface):
             kwargs['num_golds'] = golds
 
         if args.controversial:
-            cv = [int(i) for i in args.controversial[0:3]]
-            kwargs['controversial'] = tuple(cv)
+            a = [int(i) for i in args.controversial[0:3]]
+            kwargs['controversial'] = VI.range(*a)
 
         if args.consensus:
-            cn = [int(i) for i in args.consensus[0:3]]
-            kwargs['consensus'] = tuple(cn)
+            a = [int(i) for i in args.consensus[0:3]]
+            kwargs['consensus'] = VI.range(*a)
 
         e = Controversial.new(**kwargs)
         e.run()

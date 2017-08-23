@@ -1,10 +1,25 @@
 
 import math
+from collections import OrderedDict
 
 
 class ValueIterator:
 
     ###############################################################
+
+    def __init__(self, *args):
+        values = [(v.name, v) for v in args]
+        self.values = OrderedDict(values)
+
+    def __getitem__(self, key):
+        return self.values[key]
+
+    def __setitem__(self, key, value):
+        self.values[key] = value
+
+    def __iter__(self):
+        for v in self.values.values():
+            yield v
 
     @staticmethod
     def range(start, end, step):
@@ -13,6 +28,10 @@ class ValueIterator:
     @staticmethod
     def list(values):
         return _List(values)
+
+    @staticmethod
+    def single(value):
+        return _Single(value)
 
     ###############################################################
 
@@ -31,6 +50,9 @@ class _Iterator:
         return self.current
 
     def more(self):
+        pass
+
+    def first(self):
         pass
 
     def reset(self):
@@ -69,11 +91,30 @@ class _Range(_Iterator):
             return self.next() - self.end < 1e-9
         return self.next() <= self.end
 
+    def first(self):
+        return self.current == self.start
+
     def reset(self):
         self.current = self.start
 
     def count(self):
         return math.floor((self.end - self.start) / self._step) + 1
+
+
+class _Single(_Iterator):
+
+    def __init__(self, value, name=None):
+        super().__init__(name)
+        self.current = value
+
+    def more(self):
+        return False
+
+    def first(self):
+        return True
+
+    def count(self):
+        return 1
 
 
 class _List(_Iterator):
@@ -89,7 +130,11 @@ class _List(_Iterator):
 
     @current.setter
     def current(self, value):
-        pass
+        if value is not None:
+            for i, v in enumerate(self.values):
+                if v == value:
+                    self.i = i
+                    return
 
     def next(self):
         if self.more():
@@ -103,6 +148,9 @@ class _List(_Iterator):
 
     def more(self):
         return self.i + 1 < len(self.values)
+
+    def first(self):
+        return self.i == 0
 
     def reset(self):
         self.i = 0

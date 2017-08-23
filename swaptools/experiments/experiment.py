@@ -4,6 +4,7 @@ from swap.utils.golds import GoldStats, GoldGetter
 import swap.ui.ui as ui
 
 import swaptools.experiments.config as config
+from swaptools.experiments.iterators import ValueIterator as VI
 from swaptools.experiments.db import DB
 from swaptools.experiments.plots import Plotter
 
@@ -110,7 +111,7 @@ class Experiment:
         self.control = None
         self.gg = GoldGetter()
 
-        self.values = []
+        self.values = VI()
 
     ###############################################################
     ## Override by Experiment subclasses
