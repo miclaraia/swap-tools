@@ -19,7 +19,8 @@ randomex () {
     swap_tools --config-file $CONFIG randomex \
     --num-golds 1000 10000 1000 \
     --num-trials 20 \
-    --name randomex-2 --description "Attempting to reproduce previous random plots" \
+    --name randomex-3 --description "Re-running experiment to create a \
+baseline for the mse metric" \
     --run
 }
 
