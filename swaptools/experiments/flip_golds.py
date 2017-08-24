@@ -3,8 +3,9 @@ from swaptools.experiments.iterators import ValueIterator as VI
 from swaptools.experiments.experiment import Experiment
 from swaptools.experiments.experiment import Interace as _Interface
 
-from collections OrderedDict
+from collections import OrderedDict
 import logging
+import math
 
 logger = logging.getLogger(__name__)
 
@@ -30,13 +31,6 @@ class FlipGolds(Experiment):
 
         return e
 
-    def setup(self):
-        """
-        Perform any initial setup operations
-        """
-        # super().setup()
-        pass
-
     def setup_next(self):
         """
         Prepare the next experiment environment
@@ -46,13 +40,30 @@ class FlipGolds(Experiment):
         if self.values['flipped'].first():
             self.golds = OrderedDict(self.gg.random(info['golds'])())
 
-        def flip(golds, fraction):
-            
-
         self.gg.reset()
-        golds = v{}
-        self.gg.these()
+        f = info['flipped']
+        golds = self.flip_golds(self.golds, f)
+        self.gg.these(golds)
 
+    @staticmethod
+    def flip_golds(golds, fraction):
+        golds = golds.copy()
+
+        def flip(subject):
+            g = golds[subject]
+            if g == 0:
+                golds[subject] = 1
+            if g == 1:
+                golds[subject] = 0
+
+        n = len(golds)
+        n = math.floor(n * fraction)
+
+        subjects = list(golds.keys())
+        for s in subjects[:n]:
+            flip(s)
+
+        return golds
 
     def _plot(self, p):
         """
@@ -62,7 +73,7 @@ class FlipGolds(Experiment):
 
 class Interface(_Interface):
 
-    _experiment = SampleExperiment
+    _experiment = FlipGolds
 
     @property
     def command(self):
@@ -72,7 +83,7 @@ class Interface(_Interface):
         For example, this would return 'swap' for SWAPInterface
         and 'roc' for RocInterface
         """
-        return 'sample'
+        return 'flipgolds'
 
     def options(self, parser):
         """
@@ -80,9 +91,15 @@ class Interface(_Interface):
         """
         super().options(parser)
 
+        parser.add_argument('--flipped', nargs=3)
+
+        parser.add_argument('--golds', nargs='*')
+
+        parser.add_argument('--filter-golds', nargs=1)
+
     @staticmethod
     def required():
-        return ['a', 'b', 'c']
+        return ['flipped', 'golds']
 
     @staticmethod
     def run(name, description, args):
@@ -94,7 +111,20 @@ class Interface(_Interface):
             a = [float(i) for i in args.a[:3]]
             kwargs['a'] = VI.range(*a)
 
-        e = SampleExperiment.new(**kwargs)
+        e = FlipGolds.new(**kwargs)
         e.run()
 
         return e
+
+    def plot(self, args, experiment):
+        if args.filter_golds:
+            r = []
+            golds = int(args.filter_golds[0])
+            for t in experiment.trials:
+                if len(t.golds) != golds:
+                    r.append(t.id)
+
+            for i in r:
+                experiment._trials.pop(i)
+
+        super().plot(args, experiment)
