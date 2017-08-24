@@ -14,6 +14,15 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+def versions():
+    import swap
+    import swaptools
+    return OrderedDict([
+        ('swap', swap.__version__),
+        ('swaptools', swaptools.__version__)
+    ])
+
+
 class Trial:
     def __init__(self, experiment, trial, info, golds,
                  thresholds, score_stats, gold_stats):
@@ -276,11 +285,13 @@ class Experiment:
     def dict(self):
         name = self.info['name']
         desc = self.info['description']
+
         return OrderedDict([
             ('experiment', self.id),
             ('name', name),
             ('description', desc),
-            ('trials', self.count())
+            ('trials', self.count()),
+            ('versions', versions()),
         ])
 
     def add_trial(self, trial):

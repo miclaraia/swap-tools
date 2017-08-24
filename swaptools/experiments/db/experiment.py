@@ -20,6 +20,7 @@ class Experiments(Collection):
             'name': {'type': str},
             'description': {'type': str},
             'trials': {'type': int},
+            'versions': {'type': dict},
         }
 
     def _init_collection(self):
