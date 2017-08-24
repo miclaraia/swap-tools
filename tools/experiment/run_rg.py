@@ -1,10 +1,20 @@
 #!/usr/bin/env python
 
+from swap import config
 
 from swaptools.experiments.random_golds import RandomGolds
 from swaptools.experiments.iterators import ValueIterator as VI
 
+from os import path
+
+def override_config():
+    here = path.abspath(path.dirname(__file__))
+    fname = path.join(here, 'experiment_config.py')
+    config.import_config(fname)
+
 def main():
+    override_config()
+
     golds = list(range(1000, 10001, 1000))
     golds += [15000, 10000]
     kwargs = {
