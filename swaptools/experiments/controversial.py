@@ -233,7 +233,7 @@ class Interface(_Interface):
         }
         if args.num_golds:
             golds = int(args.num_golds[0])
-            kwargs['num_golds'] = golds
+            kwargs['num_golds'] = VI.single(golds)
 
         if args.controversial:
             a = [int(i) for i in args.controversial[0:3]]
