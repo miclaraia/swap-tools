@@ -129,7 +129,7 @@ class Interface(_Interface):
 
     @staticmethod
     def required():
-        return ['num_golds', 'prior', 'num_trials']
+        return ['num_golds', 'prior', 'series']
 
     @staticmethod
     def run(name, description, args):
@@ -146,7 +146,7 @@ class Interface(_Interface):
             kwargs['prior'] = VI.range(*a)
 
         if args.series:
-            series = int(args.num_trials[0])
+            series = int(args.series[0])
             kwargs['series'] = VI.range(1, series, 1)
 
         e = Prior.new(**kwargs)
