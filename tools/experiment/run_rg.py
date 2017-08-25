@@ -20,7 +20,7 @@ def main():
     golds = list(range(1000, 10001, 1000))
     golds += [15000, 10000]
     kwargs = {
-        'name': 'randomex-4',
+        'name': 'randomex-5',
         'description': 'Run randomex experiment with MSE and MSE_T calculation',
         'num_golds': VI.list(golds),
         'series': VI.range(1, 20, 1),
