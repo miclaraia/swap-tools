@@ -107,9 +107,13 @@ class Interface(_Interface):
             'name': name,
             'description': description,
         }
-        if args.a:
-            a = [float(i) for i in args.a[:3]]
-            kwargs['a'] = VI.range(*a)
+        if args.flipped:
+            a = [float(i) for i in args.flipped[:3]]
+            kwargs['fraction_flipped'] = VI.range(*a)
+
+        if args.golds:
+            a = [int(i) for i in args.golds]
+            kwargs['golds'] = VI.list(a)
 
         e = FlipGolds.new(**kwargs)
         e.run()

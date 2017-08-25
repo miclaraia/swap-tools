@@ -61,6 +61,14 @@ prior () {
     --run
 }
 
+flip () {
+    swap_tools --config-file $CONFIG flipgolds \
+        --golds 5000 10000 20000 40000 \
+        --flipped 0 .6 .025 \
+        --name flipgolds-1 --description "First trial flipping golds pseudo-randomly" \
+        --run
+}
+
 echo "Starting SWAP"
 run_command=$1
 
@@ -79,6 +87,9 @@ case $run_command in
         ;;
     "prior")
         prior
+        ;;
+    "flip")
+        flip
         ;;
 esac
 

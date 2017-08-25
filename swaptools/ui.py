@@ -9,6 +9,7 @@ import swaptools.experiments.user_burnin as user_burnin
 import swaptools.experiments.controversial as cv
 import swaptools.experiments.gold_proportions as gp
 import swaptools.experiments.prior as prior
+import swaptools.experiments.flip_golds as fg
 
 import logging
 logger = logging.getLogger(__name__)
@@ -437,5 +438,6 @@ def run():
     cv.Interface(ui)
     gp.Interface(ui)
     prior.Interface(ui)
+    fg.Interface(ui)
 
     ui.run()
