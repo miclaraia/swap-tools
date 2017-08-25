@@ -29,9 +29,9 @@ class Controversial(Experiment):
         super().setup()
 
         info = self.trial_info
-        cv = info['cv']
-        cn = info['cn']
-        seed = info['seed']
+        cv = self.values['cv'].end
+        cn = self.values['cn'].end
+        seed = self.values['seed'].current
 
         gg = self.gg
         self._golds = {
