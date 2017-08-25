@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from swap import config
+import swap.config.logger
 
 from swaptools.experiments.random_golds import RandomGolds
 from swaptools.experiments.iterators import ValueIterator as VI
@@ -11,6 +12,7 @@ def override_config():
     here = path.abspath(path.dirname(__file__))
     fname = path.join(here, 'experiment_config.py')
     config.import_config(fname)
+    swap.config.logger.init()
 
 def main():
     override_config()
