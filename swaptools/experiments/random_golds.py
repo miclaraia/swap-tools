@@ -30,12 +30,11 @@ class RandomGolds(Experiment):
         p.plot_2d('golds', 'score_stats.purity')
         p.plot_2d('golds', 'score_stats.completeness')
         p.plot_2d('golds', 'score_stats.retired')
-        p.plot_2d('golds', 'score_stats.retired_correct',
-                  {'y': 'Retired Correct'})
-        p.plot_2d('golds', 'score_stats.tpr', {'y': 'TPR'})
+        p.plot_2d('golds', 'score_stats.mse_t')
+        p.plot_2d('golds', 'score_stats.mse')
         p.plot_3d('thresholds.0', 'thresholds.1', 'golds',
-                  {'x': 'Bogus Threshold',
-                   'y': 'Real Threshold'})
+                  axes={'x': 'Bogus Threshold',
+                        'y': 'Real Threshold'})
 
         p.next()
         p.plot_3d('golds', 'score_stats.purity', 'score_stats.completeness')

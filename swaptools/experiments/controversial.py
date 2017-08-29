@@ -57,63 +57,56 @@ class Controversial(Experiment):
         p.plot_2d('golds', 'score_stats.purity')
         p.plot_2d('golds', 'score_stats.completeness')
         p.plot_2d('golds', 'score_stats.retired')
-        p.plot_2d(
-            'golds', 'score_stats.retired_correct',
-            {'y': 'Retired Correct'})
-        p.plot_2d('golds', 'score_stats.tpr', {'y': 'TPR'})
+        p.plot_2d('golds', 'score_stats.mse_t')
+        p.plot_2d('golds', 'score_stats.mse')
         p.plot_3d(
             'thresholds.0', 'thresholds.1', 'golds',
-            {'x': 'Bogus Threshold',
-             'y': 'Real Threshold'})
+            axes={'x': 'Bogus Threshold',
+                  'y': 'Real Threshold'})
 
         p.next({'s': 15, 'alpha': .5})
         p.plot_3d('info.cv', 'score_stats.purity', 'info.cn')
         p.plot_3d('info.cv', 'score_stats.completeness', 'info.cn')
         p.plot_3d('info.cv', 'score_stats.retired', 'info.cn')
-        p.plot_3d(
-            'info.cv', 'score_stats.retired_correct', 'info.cn',
-            {'y': 'Retired Correct'})
-        p.plot_3d('info.cv', 'score_stats.tpr', 'info.cn', {'y': 'TPR'})
+        p.plot_3d('info.cv', 'score_stats.mse_t', 'info.cn')
+        p.plot_3d('info.cv', 'score_stats.mse', 'info.cn')
         p.plot_3d(
             'thresholds.0', 'thresholds.1', 'info.cv',
-            {'x': 'Bogus Threshold',
-             'y': 'Real Threshold'})
+            axes={'x': 'Bogus Threshold',
+                  'y': 'Real Threshold'})
 
         p.next({'s': 15, 'alpha': .5})
         p.plot_3d('info.cn', 'score_stats.purity', 'info.cv')
         p.plot_3d('info.cn', 'score_stats.completeness', 'info.cv')
         p.plot_3d('info.cn', 'score_stats.retired', 'info.cv')
-        p.plot_3d(
-            'info.cn', 'score_stats.retired_correct', 'info.cv',
-            {'y': 'Retired Correct'})
-        p.plot_3d('info.cn', 'score_stats.tpr', 'info.cv', {'y': 'TPR'})
+        p.plot_3d('info.cn', 'score_stats.mse_t', 'info.cv')
+        p.plot_3d('info.cn', 'score_stats.mse', 'info.cv')
         p.plot_3d(
             'thresholds.0', 'thresholds.1', 'info.cn',
-            {'x': 'Bogus Threshold',
-             'y': 'Real Threshold'})
+            axes={'x': 'Bogus Threshold',
+                  'y': 'Real Threshold'})
 
-        p.next()
-        s = 40
+        p.next({'s': 40})
         p.plot_3d(
             'info.cv', 'info.cn',
             'score_stats.purity',
-            {'x': 'Controversial', 'y': 'Consensus'}, s=s)
+            axes={'x': 'Controversial', 'y': 'Consensus'})
         p.plot_3d(
             'info.cv', 'info.cn',
             'score_stats.completeness',
-            {'x': 'Controversial', 'y': 'Consensus'}, s=s)
+            axes={'x': 'Controversial', 'y': 'Consensus'})
         p.plot_3d(
             'info.cv', 'info.cn',
             'score_stats.retired',
-            {'x': 'Controversial', 'y': 'Consensus'}, s=s)
+            axes={'x': 'Controversial', 'y': 'Consensus'})
         p.plot_3d(
             'info.cv', 'info.cn',
-            'score_stats.retired_correct',
-            {'x': 'Controversial', 'y': 'Consensus', 'z': 'Retired Correct'},
-            s=s)
+            'score_stats.mse_t',
+            axes={'x': 'Controversial', 'y': 'Consensus'})
         p.plot_3d(
-            'info.cv', 'info.cn', 'golds',
-            {'x': 'Controversial', 'y': 'Consensus'}, s=s)
+            'info.cv', 'info.cn',
+            'score_stats.mse',
+            axes={'x': 'Controversial', 'y': 'Consensus'})
 
         p.next()
         p.plot_3d(
@@ -139,13 +132,13 @@ class Controversial(Experiment):
             'info.cv',
             'info.cn',
             'gold_stats.controversial.mean',
-            {'c': 'Controversial Average'})
+            axes={'c': 'Controversial Average'})
         p.plot_3d(
             'info.cv',
             'info.cn',
             'gold_stats.consensus.mean',
-            {'c': 'Consensus Average'})
-        p.kwargs = {}
+            axes={'c': 'Consensus Average'})
+        p.plot_args._reset()
         p.plot_2d('score_stats.fnr', 'score_stats.fpr')
 
         p.next()
