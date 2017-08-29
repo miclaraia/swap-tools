@@ -66,7 +66,7 @@ flip () {
     swap_tools --config-file $CONFIG flipgolds \
         --golds 5000 10000 20000 40000 \
         --flipped 0 .6 .025 \
-        --name flipgolds-1 --description "First trial flipping golds pseudo-randomly" \
+        --name flipgolds-2 --description "Second flip-golds trial, with fixed mse calculation" \
         --run
 }
 
