@@ -302,14 +302,18 @@ class Plotter:
         else:
             self.kwargs.set_defaults(kwargs)
 
-        self.figures += 1
-        self.plots[self.figures] = []
+        if len(self.plots[self.figures]) > 0:
+            self.figures += 1
+            self.plots[self.figures] = []
 
     def run(self):
         fname = self.fname
         sns.reset_orig()
 
         for i, plots in self.plots.items():
+            if plots == []:
+                continue
+
             print('Plot %d' % i)
             width = math.ceil(math.sqrt(len(plots)))
             height = math.ceil(len(plots) / width)
