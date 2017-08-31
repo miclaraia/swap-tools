@@ -151,7 +151,7 @@ class Interface(_Interface):
             kwargs['golds'] = VI.list(a)
 
         if args.series:
-            a = int(args.series)
+            a = int(args.series[0])
             kwargs['series'] = VI.range(1, a, 1)
 
         if args.shuffle:
