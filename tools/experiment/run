@@ -66,8 +66,19 @@ flip () {
     swap_tools --config-file $CONFIG flipgolds \
         --golds 5000 10000 20000 40000 \
         --flipped 0 .6 .025 \
-        --name flipgolds-2 --description "Second flip-golds trial, with fixed mse calculation" \
+        --series 5 \
+        --name flipgolds-3 --description "Second flip-golds trial, with fixed mse calculation" \
         --run
+}
+
+flip_shuffle () {
+    swap_tools --config-file $CONFIG flipgolds \
+        --golds 5000 10000 20000 40000 \
+        --flipped 0 .6 .025 \
+        --series 1 \
+        --name flipshuffle-1 --description "Flip golds shuffle experiment, where gold labels are shuffled between every trial" \
+        --run
+
 }
 
 echo "Starting SWAP"
@@ -91,6 +102,9 @@ case $run_command in
         ;;
     "flip")
         flip
+        ;;
+    "flip_s")
+        flip_shuffle
         ;;
 esac
 

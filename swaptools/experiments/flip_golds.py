@@ -6,6 +6,7 @@ from swaptools.experiments.experiment import Interace as _Interface
 from collections import OrderedDict
 import logging
 import math
+import random
 
 logger = logging.getLogger(__name__)
 
@@ -17,17 +18,22 @@ class FlipGolds(Experiment):
         self.golds = {}
 
     @classmethod
-    def new(cls, golds, fraction_flipped, *args, **kwargs):
+    def new(cls, golds, fraction_flipped, series, *args,
+            shuffle=False, **kwargs):
         # Generate the experiment with the appropriate id
         # name, and description
+
         e = super().new(*args, **kwargs)
 
         # Set the names of the value iterators
         golds._name('golds')
         fraction_flipped._name('flipped')
+        series._name('series')
+
+        e.info['shuffle'] = shuffle
 
         # Assign the value iterators instance variable
-        e.values = VI(fraction_flipped, golds)
+        e.values = VI(fraction_flipped, series, golds)
 
         return e
 
@@ -40,10 +46,20 @@ class FlipGolds(Experiment):
         if self.values['flipped'].first():
             self.golds = OrderedDict(self.gg.random(info['golds'])())
 
+        if self.info['shuffle']:
+            golds = self.shuffle_golds(self.golds)
+        else:
+            golds = self.golds
+
         self.gg.reset()
         f = info['flipped']
-        golds = self.flip_golds(self.golds, f)
+        golds = self.flip_golds(golds, f)
         self.gg.these(golds)
+
+    @staticmethod
+    def shuffle_golds(data):
+        golds = sorted(data.items(), key=lambda x: random.random())
+        return OrderedDict(golds)
 
     @staticmethod
     def flip_golds(golds, fraction):
@@ -78,6 +94,10 @@ class FlipGolds(Experiment):
         p.plot_3d('thresholds.0', 'thresholds.1', 'golds',
                   axes={'x': 'Bogus Threshold',
                         'y': 'Real Threshold'})
+        p.next()
+        p.plot_3d('thresholds.0', 'thresholds.1', 'info.flipped',
+                  axes={'x': 'Bogus Threshold',
+                        'y': 'Real Threshold'})
 
         p.run()
 
@@ -106,7 +126,11 @@ class Interface(_Interface):
 
         parser.add_argument('--golds', nargs='*')
 
+        parser.add_argument('--series', nargs=1)
+
         parser.add_argument('--filter-golds', nargs=1)
+
+        parser.add_argument('--shuffle', action='store_true')
 
     @staticmethod
     def required():
@@ -125,6 +149,13 @@ class Interface(_Interface):
         if args.golds:
             a = [int(i) for i in args.golds]
             kwargs['golds'] = VI.list(a)
+
+        if args.series:
+            a = int(args.series[0])
+            kwargs['series'] = VI.range(1, a, 1)
+
+        if args.shuffle:
+            kwargs['shuffle'] = True
 
         e = FlipGolds.new(**kwargs)
         e.run()
