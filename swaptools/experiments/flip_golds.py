@@ -94,6 +94,10 @@ class FlipGolds(Experiment):
         p.plot_3d('thresholds.0', 'thresholds.1', 'golds',
                   axes={'x': 'Bogus Threshold',
                         'y': 'Real Threshold'})
+        p.next()
+        p.plot_3d('thresholds.0', 'thresholds.1', 'info.flipped',
+                  axes={'x': 'Bogus Threshold',
+                        'y': 'Real Threshold'})
 
         p.run()
 
