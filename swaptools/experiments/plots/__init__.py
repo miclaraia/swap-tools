@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import seaborn as sns
 import numpy as np
+import statistics as st
 
 
 def plot(func):
@@ -161,6 +162,63 @@ class Plotter:
 
         return ax
 
+    @plot
+    def plot_ebar(
+            self, ax, x_key, y_key,
+            kwargs):
+        """
+        Draw an error bar plot. Plots the mean and standard deviation of 
+        values that share an x-coordinate.
+        """
+
+        kwargs['keys'] = (x_key, y_key)
+        data = self.get_data()
+        pltargs = self.plot_args()
+
+        # Group the data by their x-coordinates
+        bins = {}
+        for x, y in data:
+            if x not in bins:
+                bins[x] = []
+            bins[x].append(y)
+
+        # Sort the data by x-coordinate and calculate the 
+        # mean and standard deviation in each bin
+        out = []
+        for x in sorted(bins):
+            m = st.mean(bins[x])
+            s = st.stdev(bins[x])
+            out.append((x, m, s))
+
+        x, y, yerr = zip(*out)
+        plt.errorbar(x, y, yerr=yerr, fmt='o')
+
+        axes = self.axes()
+        title = '%(x)s vs %(y)s' % axes
+        self.pretty(ax, axes, title)
+
+
+    def bin_reg(self, ax):
+        """
+        Draw a line following the mean of values that share an x-coordinate
+        """
+        data = self.get_data()
+        bins = {}
+        for x, y in data:
+            if x not in bins:
+                bins[x] = []
+
+            bins[x].append(y)
+
+        line = []
+        for x in sorted(bins):
+            y = st.mean(bins[x])
+            line.append((x, y))
+
+        x, y = zip(*line)
+        ax.plot(x, y)
+
+
     #############################################################
 
     def axes(self):
@@ -285,6 +343,9 @@ class Plotter:
                 ax.set_ylim(left, right)
             if 'title' in kwargs:
                 ax.set_title(kwargs['title'])
+
+            if kwargs.get('regression') is True:
+                self.bin_reg(ax)
 
         self.plots[self.figures].append(inner)
 
