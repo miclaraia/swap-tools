@@ -58,7 +58,7 @@ prior () {
     --num-golds 10000 \
     --prior .05 .95 .05 \
     --series 3 \
-    --name prior-2 --description "Repeating prior experiment with mse and mset measurements" \
+    --name prior-3 --description "Repeating prior experiment with mse and mset measurements" \
     --run
 }
 
