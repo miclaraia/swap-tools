@@ -26,7 +26,7 @@ class Prior(Experiment):
     def setup_next(self):
         info = self.trial_info
 
-        if info['series'] == 1:
+        if info['prior'].first():
             self.gg.reset()
             self.gg.random(info['golds'])
 
