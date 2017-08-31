@@ -69,6 +69,17 @@ class FlipGolds(Experiment):
         """
         Plotting for this experiment
         """
+        p.next(None, {'discrete': True})
+        p.plot_3d('info.flipped', 'score_stats.purity', 'golds')
+        p.plot_3d('info.flipped', 'score_stats.completeness', 'golds')
+        p.plot_3d('info.flipped', 'score_stats.retired', 'golds')
+        p.plot_3d('info.flipped', 'score_stats.mse_t', 'golds')
+        p.plot_3d('info.flipped', 'score_stats.mse', 'golds')
+        p.plot_3d('thresholds.0', 'thresholds.1', 'golds',
+                  axes={'x': 'Bogus Threshold',
+                        'y': 'Real Threshold'})
+
+        p.run()
 
 
 class Interface(_Interface):

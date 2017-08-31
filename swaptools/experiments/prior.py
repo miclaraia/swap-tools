@@ -33,15 +33,17 @@ class Prior(Experiment):
         config.p0 = info['prior']
 
     def _plot(self, p):
-        p.plot_2d('info.prior', 'score_stats.purity')
-        p.plot_2d('info.prior', 'score_stats.completeness')
-        p.plot_2d('info.prior', 'score_stats.retired')
-        p.plot_2d('info.prior', 'score_stats.retired_correct',
-                  {'y': 'Retired Correct'})
-        p.plot_2d('info.prior', 'score_stats.tpr', {'y': 'TPR'})
+        p.next(None, {'discrete': True})
+        p.plot_3d('info.prior', 'score_stats.purity', 'info.series')
+        p.plot_3d('info.prior', 'score_stats.completeness', 'info.series')
+        p.plot_3d('info.prior', 'score_stats.retired', 'info.series')
+        p.plot_2d('info.prior', 'score_stats.mse_t')
+        p.plot_2d('info.prior', 'score_stats.mse')
         p.plot_3d('thresholds.0', 'thresholds.1', 'info.prior',
-                  {'x': 'Bogus Threshold',
-                   'y': 'Real Threshold'})
+                  axes={'x': 'Bogus Threshold',
+                        'y': 'Real Threshold'},
+                  discrete=False,
+        )
 
         p.next()
         p.plot_3d('gold_stats.controversial.mean', 'golds',

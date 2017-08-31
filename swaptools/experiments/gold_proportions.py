@@ -36,6 +36,7 @@ class GoldProportions(Experiment):
         self.gg.random(bogus, 0)
 
     def _plot(self, p):
+        p.next(None, {'discrete': False})
         p.plot_3d('thresholds.0', 'thresholds.1', 'info.fraction',
                   axes={'x': 'Bogus Threshold',
                         'y': 'Real Threshold'})
@@ -65,6 +66,8 @@ class GoldProportions(Experiment):
             'info.golds',
             ylim=(.7, 1),
         )
+        p.plot_3d('info.fraction', 'score_stats.mse_t', 'info.golds')
+        p.plot_3d('info.fraction', 'score_stats.mse', 'info.golds')
 
         def cond(value):
             def f(data_point):
@@ -159,6 +162,40 @@ class GoldProportions(Experiment):
             'score_stats.retired_correct',
             'golds',
             ylim=(.7, 1),
+        )
+
+        p.next(None, {'discrete': True, 'domain': [5000, 10000, 20000]})
+        p.plot_3d(
+            'info.fraction', 'score_stats.mse_t', 'info.golds',
+            filter=cond(20000),
+            ylim=(.1, .13)
+        )
+        p.plot_3d(
+            'info.fraction', 'score_stats.mse_t', 'info.golds',
+            filter=cond(10000),
+            ylim=(.1, .13)
+        )
+        p.plot_3d(
+            'info.fraction', 'score_stats.mse_t', 'info.golds',
+            filter=cond(5000),
+            ylim=(.1, .13)
+        )
+
+        p.next(None, {'discrete': True, 'domain': [5000, 10000, 20000]})
+        p.plot_3d(
+            'info.fraction', 'score_stats.mse', 'info.golds',
+            filter=cond(20000),
+            ylim=(.075, .1)
+        )
+        p.plot_3d(
+            'info.fraction', 'score_stats.mse', 'info.golds',
+            filter=cond(10000),
+            ylim=(.075, .1)
+        )
+        p.plot_3d(
+            'info.fraction', 'score_stats.mse', 'info.golds',
+            filter=cond(5000),
+            ylim=(.075, .1)
         )
 
         p.run()

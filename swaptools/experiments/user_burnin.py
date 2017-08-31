@@ -33,14 +33,13 @@ class UserBurnin(Experiment):
         p.plot_2d('info.gamma', 'score_stats.purity')
         p.plot_2d('info.gamma', 'score_stats.completeness')
         p.plot_2d('info.gamma', 'score_stats.retired')
-        p.plot_2d('info.gamma', 'score_stats.retired_correct',
-                  {'y': 'Retired Correct'})
-        p.plot_2d('info.gamma', 'score_stats.tnr')
+        p.plot_2d('info.gamma', 'score_stats.mse_t')
+        p.plot_2d('info.gamma', 'score_stats.mse')
         p.plot_3d('thresholds.0', 'thresholds.1', 'info.gamma',
-                  {'x': 'Bogus Threshold',
-                   'y': 'Real Threshold'})
-        p.next()
+                  axes={'x': 'Bogus Threshold',
+                        'y': 'Real Threshold'})
 
+        p.next()
         p.plot_3d('score_stats.purity', 'score_stats.completeness',
                   'info.gamma')
         p.plot_3d('score_stats.purity', 'score_stats.completeness',
@@ -50,14 +49,14 @@ class UserBurnin(Experiment):
                   'score_stats.purity')
         p.next()
         p.plot_3d('thresholds.0', 'thresholds.1', 'score_stats.retired',
-                  {'x': 'Bogus Threshold',
-                   'y': 'Real Threshold'})
+                  axes={'x': 'Bogus Threshold',
+                        'y': 'Real Threshold'})
         p.plot_3d('thresholds.0', 'thresholds.1', 'score_stats.retired_correct',
-                  {'x': 'Bogus Threshold',
-                   'y': 'Real Threshold'})
+                  axes={'x': 'Bogus Threshold',
+                        'y': 'Real Threshold'})
         p.plot_3d('thresholds.0', 'thresholds.1', 'info.gamma',
-                  {'x': 'Bogus Threshold',
-                   'y': 'Real Threshold'})
+                  axes={'x': 'Bogus Threshold',
+                        'y': 'Real Threshold'})
 
         p.plot_standard('info.gamma')
 
