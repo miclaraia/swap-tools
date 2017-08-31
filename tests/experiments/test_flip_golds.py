@@ -33,7 +33,8 @@ def generate():
     kwargs = {
         'name': None, 'description': None,
         'golds': ValueIterator.list([50, 100, 200]),
-        'fraction_flipped': ValueIterator.range(.2, .8, .2)
+        'fraction_flipped': ValueIterator.range(.2, .8, .2),
+        'series': ValueIterator.range(1, 3, 1)
     }
     e = FlipGolds.new(**kwargs)
 
@@ -54,6 +55,7 @@ class TestRandomGolds:
 
         assert e.trial_info == {
             'n': 0,
+            'series': 1,
             'flipped': .2,
             'golds': 50
         }
@@ -65,13 +67,15 @@ class TestRandomGolds:
 
         assert e.trial_info == {
             'n': 1,
+            'series': 1,
             'flipped': .4,
             'golds': 50
         }
 
-    def test_rollover(self, override):
+    def test_rollover_1(self, override):
         e = generate()
         e.n = 4
+        e.values['series'].current = 1
         e.values['flipped'].current = .8
         e.values['golds'].current = 50
 
@@ -79,6 +83,23 @@ class TestRandomGolds:
 
         assert e.trial_info == {
             'n': 5,
+            'series': 2,
+            'flipped': .2,
+            'golds': 50
+        }
+
+    def test_rollover_2(self, override):
+        e = generate()
+        e.n = 4
+        e.values['series'].current = 3
+        e.values['flipped'].current = .8
+        e.values['golds'].current = 50
+
+        e._setup_next()
+
+        assert e.trial_info == {
+            'n': 5,
+            'series': 1,
             'flipped': .2,
             'golds': 100
         }
@@ -94,6 +115,7 @@ class TestRandomGolds:
     def test_has_next_false(self, override):
         e = generate()
         e.n = 4
+        e.values['series'].current = 3
         e.values['flipped'].current = .8
         e.values['golds'].current = 200
 
@@ -101,7 +123,7 @@ class TestRandomGolds:
 
     def test_count(self, override):
         e = generate()
-        assert e.count() == 12
+        assert e.count() == 36
 
     def test_flip_golds_1(self):
         golds = gen_golds(10)
