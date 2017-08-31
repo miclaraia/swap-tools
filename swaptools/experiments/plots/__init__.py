@@ -109,7 +109,9 @@ class Plotter:
 
             if 'domain' in kwargs:
                 domain = kwargs.pop('domain')
-                cmap.domain(domain)
+            else:
+                domain = self.find_domain(data)
+            cmap.domain(domain)
 
             c = list(c)
             for i, v in enumerate(c):
@@ -317,7 +319,7 @@ class Plotter:
                     c + 1 not in domain and \
                     c - 1 not in domain:
                 domain.append(c)
-        return domain
+        return list(sorted(domain))
 
     def plot(self, func, *args, **kwargs):
         plot_args = self.plot_args()
