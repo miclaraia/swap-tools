@@ -27,11 +27,11 @@ class RandomGolds(Experiment):
         self.gg.random(info['golds'])
 
     def _plot(self, p):
-        p.plot_2d('golds', 'score_stats.purity')
-        p.plot_2d('golds', 'score_stats.completeness')
-        p.plot_2d('golds', 'score_stats.retired')
-        p.plot_2d('golds', 'score_stats.mse_t')
-        p.plot_2d('golds', 'score_stats.mse')
+        p.plot_ebar('golds', 'score_stats.purity')
+        p.plot_ebar('golds', 'score_stats.completeness')
+        p.plot_ebar('golds', 'score_stats.retired')
+        p.plot_ebar('golds', 'score_stats.mse_t')
+        p.plot_ebar('golds', 'score_stats.mse')
         p.plot_3d('thresholds.0', 'thresholds.1', 'golds',
                   axes={'x': 'Bogus Threshold',
                         'y': 'Real Threshold'})
