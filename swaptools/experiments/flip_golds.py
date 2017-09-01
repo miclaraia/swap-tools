@@ -58,6 +58,7 @@ class FlipGolds(Experiment):
 
     @staticmethod
     def shuffle_golds(data):
+        logger.debug('shuffling gold labels')
         golds = sorted(data.items(), key=lambda x: random.random())
         return OrderedDict(golds)
 
@@ -134,7 +135,7 @@ class Interface(_Interface):
 
     @staticmethod
     def required():
-        return ['flipped', 'golds']
+        return ['flipped', 'golds', 'series']
 
     @staticmethod
     def run(name, description, args):
