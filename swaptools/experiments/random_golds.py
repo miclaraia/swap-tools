@@ -37,6 +37,10 @@ class RandomGolds(Experiment):
                         'y': 'Real Threshold'})
 
         p.next()
+        p.plot_ebar('golds', 'score_stats.mse_t')
+        p.plot_ebar('golds', 'score_stats.mse')
+
+        p.next()
         p.plot_3d('golds', 'score_stats.purity', 'score_stats.completeness')
         p.plot_3d('golds', 'score_stats.purity', 'score_stats.retired')
         p.plot_3d('golds', 'score_stats.purity', 'score_stats.retired_correct')

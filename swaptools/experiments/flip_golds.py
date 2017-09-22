@@ -2,6 +2,7 @@
 from swaptools.experiments.iterators import ValueIterator as VI
 from swaptools.experiments.experiment import Experiment
 from swaptools.experiments.experiment import Interace as _Interface
+import swaptools.experiments.plots as plots
 
 from collections import OrderedDict
 import logging

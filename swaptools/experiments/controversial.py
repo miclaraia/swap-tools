@@ -86,6 +86,12 @@ class Controversial(Experiment):
             axes={'x': 'Bogus Threshold',
                   'y': 'Real Threshold'})
 
+        p.next()
+        p.plot_ebar('info.cv', 'score_stats.mse_t')
+        p.plot_ebar('info.cv', 'score_stats.mse')
+        p.plot_ebar('info.cn', 'score_stats.mse_t')
+        p.plot_ebar('info.cn', 'score_stats.mse')
+
         p.next({'s': 40})
         p.plot_3d(
             'info.cv', 'info.cn',

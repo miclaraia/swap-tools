@@ -60,14 +60,8 @@ class GoldProportions(Experiment):
             'info.golds',
             ylim=(0, 1),
         )
-        p.plot_3d(
-            'info.fraction',
-            'score_stats.retired_correct',
-            'info.golds',
-            ylim=(.7, 1),
-        )
-        p.plot_3d('info.fraction', 'score_stats.mse_t', 'info.golds')
-        p.plot_3d('info.fraction', 'score_stats.mse', 'info.golds')
+        p.plot_ebar_d('info.fraction', 'score_stats.mse_t', 'info.golds')
+        p.plot_ebar_d('info.fraction', 'score_stats.mse', 'info.golds')
 
         def cond(value):
             def f(data_point):
