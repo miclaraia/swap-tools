@@ -161,6 +161,12 @@ class Controversial(Experiment):
         p.plot_3d('info.cv', 'gold_stats.fraction', 'score_stats.completeness')
         p.plot_3d('info.cv', 'gold_stats.fraction', 'score_stats.retired')
 
+        p.plot_3d(
+            'info.fraction',
+            'score_stats.retired_correct',
+            'info.golds',
+            ylim=(.7, 1),
+        )
         p.next()
         p.plot_3d('info.cn', 'gold_stats.fraction', 'info.cv')
         p.plot_3d('info.cn', 'gold_stats.fraction', 'score_stats.purity')
