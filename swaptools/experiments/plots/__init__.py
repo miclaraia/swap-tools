@@ -110,7 +110,7 @@ class Plotter:
             if 'domain' in kwargs:
                 domain = kwargs.pop('domain')
             else:
-                domain = self.find_domain(data)
+                domain = FD.find_domain(data)
             cmap.domain(domain)
 
             c = list(c)
@@ -141,7 +141,7 @@ class Plotter:
         if 'domain' in kwargs:
             domain = kwargs['domain']
         else:
-            domain = self.find_domain(data)
+            domain = FD.find_domain(data)
 
         print(domain)
         colors = ['Blues', 'Reds', 'Greens', 'Purples']
@@ -192,12 +192,7 @@ class Plotter:
         Draw a line following the mean of values that share an x-coordinate
         """
         data = self.get_data()
-        bins = {}
-        for x, y in data:
-            if x not in bins:
-                bins[x] = []
-
-            bins[x].append(y)
+        bins = FD.bin_data(data)
 
         line = []
         for x in sorted(bins):
@@ -283,7 +278,7 @@ class Plotter:
 
         if 'filter' in self.kwargs:
             print(self.kwargs['filter'])
-            data = self.filter_data(data, self.kwargs['filter'])
+            data = FD.filter_data(data, self.kwargs['filter'])
 
         return data
 
