@@ -169,7 +169,7 @@ class Plotter:
             self, ax, x_key, y_key,
             kwargs):
         """
-        Draw an error bar plot. Plots the mean and standard deviation of 
+        Draw an error bar plot. Plots the mean and standard deviation of
         values that share an x-coordinate.
         """
 
