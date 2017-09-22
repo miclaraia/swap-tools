@@ -467,3 +467,99 @@ class DiscreteColorMap:
     def domain(self, values):
         for v in values:
             self._map(v)
+
+
+class FormatData:
+
+    @staticmethod
+    def bin_data(data, index=0):
+        # Group the data by their x-coordinates
+        bins = {}
+        for d in data:
+            k = d[index]
+            if k not in bins:
+                bins[k] = []
+            bins[k].append(d)
+
+        return bins
+
+    @classmethod
+    def error_bars(cls, data, domain=0, value=1):
+        """
+        Get the binned data and output each bin's mean and standard deviation
+
+        domain : int
+            index of the domain value in the array
+
+        value : int
+            index of the range value in the array
+        """
+        bins = cls.bin_data(data, domain)
+
+        # Sort the data by x-coordinate and calculate the
+        # mean and standard deviation in each bin
+        out = []
+        for d in sorted(bins):
+            values = [item[value] for item in bins[d]]
+            m = st.mean(values)
+            s = st.stdev(values)
+            out.append((d, m, s))
+
+        return out
+
+    @staticmethod
+    def filter_data(data, condition):
+        """
+        Filter points from all the data
+        """
+        return [d for d in data if condition(d)]
+
+    @staticmethod
+    def find_domain(data, index=2):
+        """
+        Determine all the discrete values in the domain along an axis
+        """
+        domain = []
+        for d in data:
+            c = d[index]
+            if c not in domain and \
+                    c + 1 not in domain and \
+                    c - 1 not in domain:
+                domain.append(c)
+        return list(sorted(domain))
+
+    @staticmethod
+    def get_value(trial, key):
+        """
+        Fetch a value from a trial using a key mapping
+        """
+        if key is not None:
+            if key == 'golds':
+                return len(trial.golds)
+
+            key = key.split('.')
+            value = trial.__dict__
+            for k in key:
+                if type(value) in [list, tuple]:
+                    k = int(k)
+                value = value[k]
+
+            return value
+
+    @classmethod
+    def get_data(cls, trials, keys):
+        """
+        Parse the right data out from the trials. Returns list of tuples,
+        where each tuple corresponds to the values in the keys list.
+        """
+
+        data = []
+        for t in trials:
+            values = []
+            for k in keys:
+                values.append(cls.get_value(t, k))
+            data.append(values)
+
+        return data
+
+FD = FormatData
