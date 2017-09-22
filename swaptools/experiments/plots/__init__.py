@@ -7,9 +7,11 @@ import matplotlib.patches as mpatches
 import seaborn as sns
 import numpy as np
 import statistics as st
+import functools
 
 
 def plot(func):
+    @functools.wraps(func)
     def wrapper(self, *args, **kwargs):
         self.plot(func, *args, **kwargs)
     return wrapper
