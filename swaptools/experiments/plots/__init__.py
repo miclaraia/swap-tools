@@ -177,22 +177,9 @@ class Plotter:
         data = self.get_data()
         pltargs = self.plot_args()
 
-        # Group the data by their x-coordinates
-        bins = {}
-        for x, y in data:
-            if x not in bins:
-                bins[x] = []
-            bins[x].append(y)
+        data = FD.error_bars(data, 0, 1)
+        x, y, yerr = zip(*data)
 
-        # Sort the data by x-coordinate and calculate the 
-        # mean and standard deviation in each bin
-        out = []
-        for x in sorted(bins):
-            m = st.mean(bins[x])
-            s = st.stdev(bins[x])
-            out.append((x, m, s))
-
-        x, y, yerr = zip(*out)
         plt.errorbar(x, y, yerr=yerr, fmt='o')
 
         axes = self.axes()
@@ -299,27 +286,6 @@ class Plotter:
             data = self.filter_data(data, self.kwargs['filter'])
 
         return data
-
-    @staticmethod
-    def filter_data(data, condition):
-        """
-        Filter points from all the data
-        """
-        return [d for d in data if condition(d)]
-
-    @staticmethod
-    def find_domain(data, index=2):
-        """
-        Determine all the discrete values in the domain along an axis
-        """
-        domain = []
-        for d in data:
-            c = d[index]
-            if c not in domain and \
-                    c + 1 not in domain and \
-                    c - 1 not in domain:
-                domain.append(c)
-        return list(sorted(domain))
 
     def plot(self, func, *args, **kwargs):
         plot_args = self.plot_args()
