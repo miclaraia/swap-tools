@@ -186,6 +186,32 @@ class Plotter:
         title = '%(x)s vs %(y)s' % axes
         self.pretty(ax, axes, title)
 
+    @plot
+    def plot_ebar_d(
+            self, ax, x_key, y_key, c_key,
+            kwargs):
+
+        kwargs['keys'] = (x_key, y_key, c_key)
+        data = self.get_data()
+        domain = kwargs.get('domain', FD.find_domain(data))
+        pltargs = self.plot_args()
+
+        cmap = DiscreteColorMap()
+        cmap.domain(domain)
+        self.color_legend(ax, cmap)
+
+        domain_data = FD.bin_data(data, 2)
+        print('domain_data: ', domain_data)
+        for d, data in domain_data.items():
+            data = FD.error_bars(data, 0, 1)
+            x, y, yerr = zip(*data)
+
+            plt.errorbar(x, y, c=cmap(d), yerr=yerr, fmt='o')
+
+        axes = self.axes()
+        title = '%(x)s vs %(y)s' % axes
+        self.pretty(ax, axes, title)
+
 
     def bin_reg(self, ax):
         """
