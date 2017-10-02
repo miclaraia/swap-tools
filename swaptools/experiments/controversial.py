@@ -86,6 +86,12 @@ class Controversial(Experiment):
             axes={'x': 'Bogus Threshold',
                   'y': 'Real Threshold'})
 
+        p.next()
+        p.plot_ebar('info.cv', 'score_stats.mse_t')
+        p.plot_ebar('info.cv', 'score_stats.mse')
+        p.plot_ebar('info.cn', 'score_stats.mse_t')
+        p.plot_ebar('info.cn', 'score_stats.mse')
+
         p.next({'s': 40})
         p.plot_3d(
             'info.cv', 'info.cn',
@@ -155,6 +161,12 @@ class Controversial(Experiment):
         p.plot_3d('info.cv', 'gold_stats.fraction', 'score_stats.completeness')
         p.plot_3d('info.cv', 'gold_stats.fraction', 'score_stats.retired')
 
+        p.plot_3d(
+            'info.fraction',
+            'score_stats.retired_correct',
+            'info.golds',
+            ylim=(.7, 1),
+        )
         p.next()
         p.plot_3d('info.cn', 'gold_stats.fraction', 'info.cv')
         p.plot_3d('info.cn', 'gold_stats.fraction', 'score_stats.purity')

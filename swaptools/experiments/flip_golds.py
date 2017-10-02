@@ -2,6 +2,7 @@
 from swaptools.experiments.iterators import ValueIterator as VI
 from swaptools.experiments.experiment import Experiment
 from swaptools.experiments.experiment import Interace as _Interface
+import swaptools.experiments.plots as plots
 
 from collections import OrderedDict
 import logging
@@ -95,10 +96,40 @@ class FlipGolds(Experiment):
         p.plot_3d('thresholds.0', 'thresholds.1', 'golds',
                   axes={'x': 'Bogus Threshold',
                         'y': 'Real Threshold'})
-        p.next()
+
+        # Detect whether there are multiple trials per gold label amount
+        # and fraction of labels flipped. Used to determine whether to
+        # plot points or plot error bars.
+        p.kwargs['keys'] = ['info.flipped', 'golds']
+        d = plots.FD.bin_data(p.get_data(), 0)
+        d = plots.FD.bin_data(d[next(iter(d))], 1)
+        print(d)
+        ebar = bool(len(next(iter(d.values()))) > 1)
+        p.kwargs._reset()
+
+        if ebar:
+            p.next(None, {'discrete': True})
+            p.plot_ebar_d('info.flipped', 'score_stats.purity', 'golds')
+            p.plot_ebar_d('info.flipped', 'score_stats.completeness', 'golds')
+            p.plot_ebar_d('info.flipped', 'score_stats.retired', 'golds')
+            p.plot_ebar_d('info.flipped', 'score_stats.mse_t', 'golds')
+            p.plot_ebar_d('info.flipped', 'score_stats.mse', 'golds')
+            p.plot_3d('thresholds.0', 'thresholds.1', 'golds',
+                      axes={'x': 'Bogus Threshold',
+                            'y': 'Real Threshold'})
+
+        p.next(None, {'discrete': False})
         p.plot_3d('thresholds.0', 'thresholds.1', 'info.flipped',
                   axes={'x': 'Bogus Threshold',
                         'y': 'Real Threshold'})
+
+        p.next(None, {'discrete': True})
+        if ebar:
+            p.plot_ebar_d('info.flipped', 'score_stats.mse_t', 'golds')
+            p.plot_ebar_d('info.flipped', 'score_stats.mse', 'golds')
+        else:
+            p.plot_3d('info.flipped', 'score_stats.mse_t', 'golds')
+            p.plot_3d('info.flipped', 'score_stats.mse', 'golds')
 
         p.run()
 

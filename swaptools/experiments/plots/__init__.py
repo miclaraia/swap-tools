@@ -7,9 +7,11 @@ import matplotlib.patches as mpatches
 import seaborn as sns
 import numpy as np
 import statistics as st
+import functools
 
 
 def plot(func):
+    @functools.wraps(func)
     def wrapper(self, *args, **kwargs):
         self.plot(func, *args, **kwargs)
     return wrapper
@@ -110,7 +112,7 @@ class Plotter:
             if 'domain' in kwargs:
                 domain = kwargs.pop('domain')
             else:
-                domain = self.find_domain(data)
+                domain = FD.find_domain(data)
             cmap.domain(domain)
 
             c = list(c)
@@ -141,7 +143,7 @@ class Plotter:
         if 'domain' in kwargs:
             domain = kwargs['domain']
         else:
-            domain = self.find_domain(data)
+            domain = FD.find_domain(data)
 
         print(domain)
         colors = ['Blues', 'Reds', 'Greens', 'Purples']
@@ -169,7 +171,7 @@ class Plotter:
             self, ax, x_key, y_key,
             kwargs):
         """
-        Draw an error bar plot. Plots the mean and standard deviation of 
+        Draw an error bar plot. Plots the mean and standard deviation of
         values that share an x-coordinate.
         """
 
@@ -177,23 +179,36 @@ class Plotter:
         data = self.get_data()
         pltargs = self.plot_args()
 
-        # Group the data by their x-coordinates
-        bins = {}
-        for x, y in data:
-            if x not in bins:
-                bins[x] = []
-            bins[x].append(y)
+        data = FD.error_bars(data, 0, 1)
+        x, y, yerr = zip(*data)
 
-        # Sort the data by x-coordinate and calculate the 
-        # mean and standard deviation in each bin
-        out = []
-        for x in sorted(bins):
-            m = st.mean(bins[x])
-            s = st.stdev(bins[x])
-            out.append((x, m, s))
-
-        x, y, yerr = zip(*out)
         plt.errorbar(x, y, yerr=yerr, fmt='o')
+
+        axes = self.axes()
+        title = '%(x)s vs %(y)s' % axes
+        self.pretty(ax, axes, title)
+
+    @plot
+    def plot_ebar_d(
+            self, ax, x_key, y_key, c_key,
+            kwargs):
+
+        kwargs['keys'] = (x_key, y_key, c_key)
+        data = self.get_data()
+        domain = kwargs.get('domain', FD.find_domain(data))
+        pltargs = self.plot_args()
+
+        cmap = DiscreteColorMap()
+        cmap.domain(domain)
+        self.color_legend(ax, cmap)
+
+        domain_data = FD.bin_data(data, 2)
+        print('domain_data: ', domain_data)
+        for d, data in domain_data.items():
+            data = FD.error_bars(data, 0, 1)
+            x, y, yerr = zip(*data)
+
+            plt.errorbar(x, y, c=cmap(d), yerr=yerr, fmt='o')
 
         axes = self.axes()
         title = '%(x)s vs %(y)s' % axes
@@ -205,12 +220,7 @@ class Plotter:
         Draw a line following the mean of values that share an x-coordinate
         """
         data = self.get_data()
-        bins = {}
-        for x, y in data:
-            if x not in bins:
-                bins[x] = []
-
-            bins[x].append(y)
+        bins = FD.bin_data(data)
 
         line = []
         for x in sorted(bins):
@@ -296,30 +306,9 @@ class Plotter:
 
         if 'filter' in self.kwargs:
             print(self.kwargs['filter'])
-            data = self.filter_data(data, self.kwargs['filter'])
+            data = FD.filter_data(data, self.kwargs['filter'])
 
         return data
-
-    @staticmethod
-    def filter_data(data, condition):
-        """
-        Filter points from all the data
-        """
-        return [d for d in data if condition(d)]
-
-    @staticmethod
-    def find_domain(data, index=2):
-        """
-        Determine all the discrete values in the domain along an axis
-        """
-        domain = []
-        for d in data:
-            c = d[index]
-            if c not in domain and \
-                    c + 1 not in domain and \
-                    c - 1 not in domain:
-                domain.append(c)
-        return list(sorted(domain))
 
     def plot(self, func, *args, **kwargs):
         plot_args = self.plot_args()
@@ -411,22 +400,22 @@ class Plotter:
     def plot_standard(self, standard):
         self.next()
         self.plot_3d('thresholds.0', 'thresholds.1', 'score_stats.retired',
-                     {'x': 'Bogus Threshold',
-                      'y': 'Real Threshold'})
+                     axes={'x': 'Bogus Threshold',
+                           'y': 'Real Threshold'})
         self.plot_3d('thresholds.0', 'thresholds.1',
                      'score_stats.retired_correct',
-                     {'x': 'Bogus Threshold',
-                      'y': 'Real Threshold'})
+                     axes={'x': 'Bogus Threshold',
+                           'y': 'Real Threshold'})
         self.plot_3d('thresholds.0', 'thresholds.1', 'score_stats.purity',
-                     {'x': 'Bogus Threshold',
-                      'y': 'Real Threshold'})
+                     axes={'x': 'Bogus Threshold',
+                           'y': 'Real Threshold'})
         self.plot_3d('thresholds.0', 'thresholds.1', 'score_stats.completeness',
-                     {'x': 'Bogus Threshold',
-                      'y': 'Real Threshold'})
+                     axes={'x': 'Bogus Threshold',
+                           'y': 'Real Threshold'})
         self.plot_3d(
             'thresholds.0', 'thresholds.1', standard,
-            {'x': 'Bogus Threshold',
-             'y': 'Real Threshold'})
+            axes={'x': 'Bogus Threshold',
+                  'y': 'Real Threshold'})
 
         self.next()
         self.plot_3d('score_stats.fnr', 'score_stats.fpr', standard)
@@ -467,3 +456,99 @@ class DiscreteColorMap:
     def domain(self, values):
         for v in values:
             self._map(v)
+
+
+class FormatData:
+
+    @staticmethod
+    def bin_data(data, index=0):
+        # Group the data by their x-coordinates
+        bins = {}
+        for d in data:
+            k = d[index]
+            if k not in bins:
+                bins[k] = []
+            bins[k].append(d)
+
+        return bins
+
+    @classmethod
+    def error_bars(cls, data, domain=0, value=1):
+        """
+        Get the binned data and output each bin's mean and standard deviation
+
+        domain : int
+            index of the domain value in the array
+
+        value : int
+            index of the range value in the array
+        """
+        bins = cls.bin_data(data, domain)
+
+        # Sort the data by x-coordinate and calculate the
+        # mean and standard deviation in each bin
+        out = []
+        for d in sorted(bins):
+            values = [item[value] for item in bins[d]]
+            m = st.mean(values)
+            s = st.stdev(values)
+            out.append((d, m, s))
+
+        return out
+
+    @staticmethod
+    def filter_data(data, condition):
+        """
+        Filter points from all the data
+        """
+        return [d for d in data if condition(d)]
+
+    @staticmethod
+    def find_domain(data, index=2):
+        """
+        Determine all the discrete values in the domain along an axis
+        """
+        domain = []
+        for d in data:
+            c = d[index]
+            if c not in domain and \
+                    c + 1 not in domain and \
+                    c - 1 not in domain:
+                domain.append(c)
+        return list(sorted(domain))
+
+    @staticmethod
+    def get_value(trial, key):
+        """
+        Fetch a value from a trial using a key mapping
+        """
+        if key is not None:
+            if key == 'golds':
+                return len(trial.golds)
+
+            key = key.split('.')
+            value = trial.__dict__
+            for k in key:
+                if type(value) in [list, tuple]:
+                    k = int(k)
+                value = value[k]
+
+            return value
+
+    @classmethod
+    def get_data(cls, trials, keys):
+        """
+        Parse the right data out from the trials. Returns list of tuples,
+        where each tuple corresponds to the values in the keys list.
+        """
+
+        data = []
+        for t in trials:
+            values = []
+            for k in keys:
+                values.append(cls.get_value(t, k))
+            data.append(values)
+
+        return data
+
+FD = FormatData
